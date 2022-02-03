@@ -1,16 +1,34 @@
 
 import streamlit as st
-import win32clipboard
+import os
+if os.name == 'nt':
+	import win32clipboard
+	from PIL import Image
+	from base64 import b64decode
+	from io import BytesIO
+	import psutil
+
+	def send_to_clipboard(img_path):
+		image = Image.open(img_path)#path
+		output = BytesIO()
+		image.convert("RGB").save(output, "BMP")
+		data = output.getvalue()[14:]
+		#print(data)
+		output.close()
+		win32clipboard.OpenClipboard()
+		win32clipboard.EmptyClipboard()
+		win32clipboard.SetClipboardData(win32clipboard.CF_DIB, data)
+elif os.name == 'posix':
+	import subprocess
 import re
-from PIL import Image
-from base64 import b64decode
-from io import BytesIO
+
+
 import pandas as pd
 import strings as literais
 from whats import Cliente
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
-import psutil
+
 from streamlit_quill import st_quill as text_editor
 from st_aggrid import AgGrid, DataReturnMode, GridUpdateMode, GridOptionsBuilder
 
@@ -26,16 +44,7 @@ st.set_page_config(
 	}
 )
 
-def send_to_clipboard(img_path):
-	image = Image.open(img_path)#path
-	output = BytesIO()
-	image.convert("RGB").save(output, "BMP")
-	data = output.getvalue()[14:]
-	#print(data)
-	output.close()
-	win32clipboard.OpenClipboard()
-	win32clipboard.EmptyClipboard()
-	win32clipboard.SetClipboardData(win32clipboard.CF_DIB, data)
+
 
 if "contatos_salvos" not in st.session_state: st.session_state["contatos_salvos"] = pd.DataFrame([''], columns=['contatos'])
 
@@ -187,8 +196,8 @@ if abrir or st.session_state.beta_on == 'BETA':
 						readonly=caixa.checkbox("Apenas leitura", False),
 						key="quill",)
 					#st.markdown(literais.css_remove_unused_itens, unsafe_allow_html=True)
-					
-					listar_imgs = re.findall( r'src="data:image/(.*?);base64,(.*?)"', fr'{content}')
+					if os.name == 'nt':
+						listar_imgs = re.findall( r'src="data:image/(.*?);base64,(.*?)"', fr'{content}')
 					enviar =  st.button('Enviar')
 					#pos_ = 0
 					#for _ in listar_imgs:
@@ -202,18 +211,24 @@ if abrir or st.session_state.beta_on == 'BETA':
 						st.subheader("Resultado")
 						
 					if content:
-						if len(listar_imgs) > 0:
-							pos = 0
-							for _ in listar_imgs:	#cria as imagens localmente
-								with open(f"imagem-{pos}.{listar_imgs[pos][0]}", 'wb') as wrb:
-									wrb.write(b64decode(listar_imgs[pos][1]))
-								send_to_clipboard(f"imagem-0.png")
-								
-								pos += 1
-						else:
-							st.markdown('____')
-							st.markdown(content, unsafe_allow_html=True)
-							st.markdown('____')
+						if os.name == 'nt':
+							if len(listar_imgs) > 0:
+								pos = 0
+								for _ in listar_imgs:	#cria as imagens localmente
+									with open(f"imagem-{pos}.{listar_imgs[pos][0]}", 'wb') as wrb:
+										wrb.write(b64decode(listar_imgs[pos][1]))
+									send_to_clipboard(f"imagem-0.png")
+									
+									pos += 1
+							else:
+								st.markdown('____')
+								st.markdown(content, unsafe_allow_html=True)
+								st.markdown('____')
+						elif os.name == 'posix':
+								st.markdown('____')
+								st.markdown(content, unsafe_allow_html=True)
+								st.markdown('____')
+							
 			with col2:
 				try:
 					grade()

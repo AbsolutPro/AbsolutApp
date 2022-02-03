@@ -1,4 +1,5 @@
 import re
+import os
 import pandas as pd
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
@@ -28,17 +29,6 @@ def html_to_wppedit(raw_html):
 	CLEANR = re.compile('<.*?>')
 	cleantext = re.sub(CLEANR, '', clean_negrito_text)
 	return cleantext
-
-def send_to_clipboard(img_path):
-	image = Image.open(img_path)#path
-	output = BytesIO()
-	image.convert("RGB").save(output, "BMP")
-	data = output.getvalue()[14:]
-	#print(data)
-	output.close()
-	win32clipboard.OpenClipboard()
-	win32clipboard.EmptyClipboard()
-	win32clipboard.SetClipboardData(win32clipboard.CF_DIB, data)
 
 def listar_nomes(texto):
 	#print(f'O TEXTO \n\n\n {texto}') '' "" `` 
@@ -187,73 +177,120 @@ class Cliente:
 		listar_imgs = re.findall( r'src="data:image/(.*?);base64,(.*?)"', fr'{mensagem}')
 		texto_p_enviar = html_to_wppedit(mensagem)
 		#lista_imgs_ext = []
+		if os.name == 'nt':
 
-		if bool(listar_imgs):
-			
-			wait = WebDriverWait(self.google, 5)
-			contagem = 0
-
-			while ate_o_fim:
-				if contagem >= len(contatos_['contatos']) - 1: ate_o_fim = False
+			if bool(listar_imgs):
 				
-				btn_search = wait.until(EC.presence_of_element_located(GetLocator.SEARCH_INPUT))
-				btn_search.click()
+				wait = WebDriverWait(self.google, 5)
+				contagem = 0
 
-				btn_search.send_keys(contatos_['contatos'][contagem])
-				time.sleep(1)
-
-				btn_search.send_keys(Keys.ARROW_DOWN)
-
-				time.sleep(1)
-				ctt_selected = wait.until(EC.presence_of_element_located((By.CLASS_NAME, '_2_TVt')))
-				ctt_selected.click()
-				time.sleep(1)
-
-				btn_clear = wait.until(EC.presence_of_element_located(GetLocator.CLEAR_BUTTON))
-				btn_clear.click()
-				time.sleep(1)
-
-				try:
-					espaco_enviar = wait.until(EC.presence_of_element_located(GetLocator.TEXT_BOX_CHAT))
-					espaco_enviar.click()
-					time.sleep(2)
-
-					pos = 0# CTRL + C
-					for _ in listar_imgs:
-						img_name = f"imagem-{pos}.{listar_imgs[pos][0]}"#posição da extensao da img POS
-						print(f'NOME DAS IMAGENS: {img_name} ')
-						#self.img_para_ctrl_c(img_name)
-						time.sleep(2)
-						actions = ActionChains(self.google)
-						#espaco_enviar.send_keys(Keys.CONTROL, 'v')
-						actions.key_down(Keys.CONTROL).send_keys('v').key_up(Keys.CONTROL).perform()
-						time.sleep(10)
-						print(f'CRTL V já foi 1º: {img_name} ')
-						#actions.key_down(Keys.CONTROL).send_keys('z').key_up(Keys.CONTROL).perform()
-						#actions.key_down(Keys.CONTROL).send_keys('v').key_up(Keys.CONTROL).perform()
-				except:
-					print(f'FALHA AO ANEXAR UMA IMAGEM {e}')
-				finally:
-					pass
-				try:
-					espaco_enviar = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="app"]/div[1]/div[1]/div[2]/div[2]/span/div[1]/span/div[1]/div/div[2]/div/div[1]/div[3]/div/div/div[2]/div[1]/div[2]')))
-					espaco_enviar.send_keys(texto_p_enviar) #texto para enviar
+				while ate_o_fim:
+					if contagem >= len(contatos_['contatos']) - 1: ate_o_fim = False
 					
-					botao_enviar = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="main"]/footer/div[1]/div/span[2]/div/div[2]/div[2]/button')))
-					botao_enviar.click()
-					#BOTAO enviar
-				except Exception as e:
-					print(f'FALHA AO DIGITAR MENSAGEM {e}')
-				finally:
-					pass
+					btn_search = wait.until(EC.presence_of_element_located(GetLocator.SEARCH_INPUT))
+					btn_search.click()
 
-				contagem += 1
+					btn_search.send_keys(contatos_['contatos'][contagem])
+					time.sleep(1)
 
-			self.google.quit()
+					btn_search.send_keys(Keys.ARROW_DOWN)
+
+					time.sleep(1)
+					ctt_selected = wait.until(EC.presence_of_element_located((By.CLASS_NAME, '_2_TVt')))
+					ctt_selected.click()
+					time.sleep(1)
+
+					btn_clear = wait.until(EC.presence_of_element_located(GetLocator.CLEAR_BUTTON))
+					btn_clear.click()
+					time.sleep(1)
+
+					try:
+						espaco_enviar = wait.until(EC.presence_of_element_located(GetLocator.TEXT_BOX_CHAT))
+						espaco_enviar.click()
+						time.sleep(2)
+
+						pos = 0# CTRL + C
+						for _ in listar_imgs:
+							img_name = f"imagem-{pos}.{listar_imgs[pos][0]}"#posição da extensao da img POS
+							print(f'NOME DAS IMAGENS: {img_name} ')
+							#self.img_para_ctrl_c(img_name)
+							time.sleep(2)
+							actions = ActionChains(self.google)
+							#espaco_enviar.send_keys(Keys.CONTROL, 'v')
+							actions.key_down(Keys.CONTROL).send_keys('v').key_up(Keys.CONTROL).perform()
+							time.sleep(10)
+							print(f'CRTL V já foi 1º: {img_name} ')
+							#actions.key_down(Keys.CONTROL).send_keys('z').key_up(Keys.CONTROL).perform()
+							#actions.key_down(Keys.CONTROL).send_keys('v').key_up(Keys.CONTROL).perform()
+					except:
+						print(f'FALHA AO ANEXAR UMA IMAGEM {e}')
+					finally:
+						pass
+					try:
+						espaco_enviar = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="app"]/div[1]/div[1]/div[2]/div[2]/span/div[1]/span/div[1]/div/div[2]/div/div[1]/div[3]/div/div/div[2]/div[1]/div[2]')))
+						espaco_enviar.send_keys(texto_p_enviar) #texto para enviar
+						
+						botao_enviar = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="main"]/footer/div[1]/div/span[2]/div/div[2]/div[2]/button')))
+						botao_enviar.click()
+						#BOTAO enviar
+					except Exception as e:
+						print(f'FALHA AO DIGITAR MENSAGEM {e}')
+					finally:
+						pass
+
+					contagem += 1
+
+				self.google.quit()
+					
 				
-			
 
-		else:
+			else:
+				wait = WebDriverWait(self.google, 5)
+				contagem = 0
+
+				while ate_o_fim:
+					if contagem >= len(contatos_['contatos']) - 1: ate_o_fim = False
+					try:#abrir janela clicar em pesquisa. esperar item carregado
+						
+						#click em pesquisar
+						btn_search = wait.until(EC.presence_of_element_located(GetLocator.SEARCH_INPUT))
+						btn_search.click()
+
+						btn_search.send_keys(contatos_['contatos'][contagem])
+						# insere nome do contato
+
+						time.sleep(1)
+						btn_search.send_keys(Keys.ARROW_DOWN)
+						ctt_selected = wait.until(EC.presence_of_element_located((By.CLASS_NAME, '_2_TVt')))
+						ctt_selected.click()
+						time.sleep(1)
+						#abre contato selecionado
+
+						btn_clear = wait.until(EC.presence_of_element_located(GetLocator.CLEAR_BUTTON))
+						btn_clear.click()
+						
+						time.sleep(1)
+						#apaga busca anterior
+						try:
+							espaco_enviar = wait.until(EC.presence_of_element_located(GetLocator.TEXT_BOX_CHAT))
+							espaco_enviar.send_keys(texto_p_enviar) #texto para enviar
+							#BOTAO enviar
+							box_buscador = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="main"]/footer/div[1]/div/span[2]/div/div[2]/div[2]/button')))
+							box_buscador.click()
+						except Exception as e:
+							print(f'FALHA AO ABRIR CHAT {e}')
+						finally:
+							pass
+					except Exception as e:
+						print(f'FALHA  App Whats. Não achei algum elemento {e}')
+					finally:
+						time.sleep(2)
+
+					contagem +=1
+					time.sleep(1)
+				self.google.quit()
+			#self.google.maximize_window()
+		elif os.name == 'posix':
 			wait = WebDriverWait(self.google, 5)
 			contagem = 0
 
@@ -298,8 +335,6 @@ class Cliente:
 				contagem +=1
 				time.sleep(1)
 			self.google.quit()
-		#self.google.maximize_window()
-
 	def ultima_conversa(self, contatos_):#dataframe['contatos'], text-img.txt
 		ate_o_fim = True
 		self.google.get(self.URL)
@@ -405,8 +440,4 @@ class GetLocator(object):
 	
 	"""
 		:chat: CLASS
-	"""
-	CHAT_CLASS_ = (By.CSS_SELECTOR,'#pane-side > div:nth-child(1) > div > div > div:nth-child(9) > div > div > div > div._2EU3r')
-	"""
-	<div tabindex="-1" aria-selected="false" role="row">
 	"""
