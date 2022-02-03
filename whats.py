@@ -146,22 +146,26 @@ class Cliente:
 		wait = WebDriverWait(self.google, 30)
 		try:
 			btn_search = wait.until(EC.presence_of_element_located(GetLocator.SEARCH_INPUT))
-			btn_search.click()
+			btn_search.send_keys('')
 			time.sleep(1)
 			chat_bloco = wait.until(EC.presence_of_element_located(GetLocator.CHAT_BLOC))
 			ctt_nome_anterior = ''
-			#mini_chat_anterior = ''
+			chat_bloco.send_keys(Keys.ARROW_DOWN)
+
 			is_chat_not_end = True
 			while is_chat_not_end:
-				chat_bloco.send_keys(Keys.ARROW_DOWN)
+				
 				chat_ctt_selected = wait.until(EC.presence_of_element_located((By.CLASS_NAME, '_2_TVt')))
 				selected_name = listar_nomes(str(chat_ctt_selected.get_attribute('innerHTML')))
 				chat_ctts += selected_name
+				
+				chat_bloco.send_keys(Keys.ARROW_DOWN)
+
 				if selected_name[0] != ctt_nome_anterior:
 					ctt_nome_anterior = selected_name[0]
 				else:
 					is_chat_not_end = False
-				time.sleep(1)
+				time.sleep(3)
 			chat_ctts = list(dict.fromkeys(chat_ctts))
 			return chat_ctts
 
