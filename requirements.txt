@@ -1,0 +1,5 @@
+streamlit=1.5.0
+selenium==4.1.0
+psutil==5.9.0
+streamlit-quill==0.0.3
+streamlit-aggrid==0.2.3.post2

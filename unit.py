@@ -116,14 +116,14 @@ st.markdown(literais.css_botao_boneca_russa, unsafe_allow_html=True)
 
 with st.container():
 	
-	if st.button('Enviar', on_click=send_to_clipboard('imagem-0.png')):
-		
+	if st.button('Enviar', ):
+		#on_click=send_to_clipboard('imagem-0.png')
 		st.info('imagem anexada')
 
 	if st.button('confirma',):
 		st.info('Executando Chrome')
 		ui_caminhar_chat()
-		
+
 
 
 
