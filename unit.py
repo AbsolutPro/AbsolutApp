@@ -1,8 +1,20 @@
-import time
+
 import streamlit as st
-import win32clipboard
-from PIL import Image
-from io import BytesIO
+import os
+if os.name == 'nt':
+	import win32clipboard
+	from PIL import Image
+	from io import BytesIO
+	def send_to_clipboard(img_path):
+		image = Image.open(img_path)#path
+		output = BytesIO()
+		image.convert("RGB").save(output, "BMP")
+		data = output.getvalue()[14:]
+		#print(data)
+		output.close()
+		win32clipboard.OpenClipboard()
+		win32clipboard.EmptyClipboard()
+		win32clipboard.SetClipboardData(win32clipboard.CF_DIB, data)
 import strings as literais
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -11,6 +23,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+import time
 
 
 st.set_page_config(
@@ -25,16 +38,7 @@ st.set_page_config(
 	}
 )
 
-def send_to_clipboard(img_path):
-	image = Image.open(img_path)#path
-	output = BytesIO()
-	image.convert("RGB").save(output, "BMP")
-	data = output.getvalue()[14:]
-	#print(data)
-	output.close()
-	win32clipboard.OpenClipboard()
-	win32clipboard.EmptyClipboard()
-	win32clipboard.SetClipboardData(win32clipboard.CF_DIB, data)
+
 
 def ui_automation():
 	#send_to_clipboard(f'imagem-0.png')
@@ -76,9 +80,8 @@ with st.container():
 		
 		st.info('imagem anexada')
 
-	if st.button('confirma', on_click=send_to_clipboard('imagem-0.png')):
-		
-		ui_automation()
+	if st.button('confirma', on_click=ui_automation()):
+		st.info('Executando Chrome')
 		
 
 
