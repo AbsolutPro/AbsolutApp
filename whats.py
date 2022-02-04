@@ -91,15 +91,16 @@ class Cliente:
 
 	def contatos(self):
 		cttss = []
+		ctt_nome_anterior = ''
+		desc_nome_anterior = ''
+		is_ctt_not_end = True
 		wait = WebDriverWait(self.google, 5)
 		try:
 			btn_ctt = wait.until(EC.presence_of_element_located(GetLocator.BTN_CHAT))
 			btn_ctt.click()
 			time.sleep(1)
 			
-			ctt_nome_anterior = ''
-			desc_nome_anterior = ''
-			is_ctt_not_end = True
+
 			
 			box_list_ctt = wait.until(EC.presence_of_element_located(GetLocator.CTT_LIST_BOX))
 			conteudo_list_ctt = str(box_list_ctt.get_attribute('innerHTML'))
