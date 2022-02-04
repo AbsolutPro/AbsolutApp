@@ -46,12 +46,25 @@ def listar_nomes(texto):
 	else:
 		return re.findall(r'<span dir="auto" title="(.*?)" class="gg', texto)
 
+def ui_login():
+	#send_to_clipboard(f'imagem-0.png')
+	opts = Options()
+	#opts.add_argument("--user-data-dir=C:\\Users\\Victor\\AppData\\Local\\Google\\Chrome\\User Data\\Profile 4")
+	opts.add_argument("---headless")
+	driver = webdriver.Chrome(options=opts)#options=opts ---headless
+	driver.get('https://web.whatsapp.com/')
+	driver.maximize_window()
+	wait = WebDriverWait(driver, 60)
+	driver.save_screenshot('screenie.png')
+	time.sleep(3)
+	print('confirma')
 
 def ui_caminhar_chat():
 	#send_to_clipboard(f'imagem-0.png')
 	opts = Options()
 	opts.add_argument("--user-data-dir=C:\\Users\\Victor\\AppData\\Local\\Google\\Chrome\\User Data\\Profile 4")
-	driver = webdriver.Chrome(options=opts)#options=opts ---headless
+	#opts.add_argument("---headless")
+	driver = webdriver.Chrome(options=opts)
 	driver.get('https://web.whatsapp.com/')
 	driver.maximize_window()
 	wait = WebDriverWait(driver, 60)
@@ -122,7 +135,7 @@ with st.container():
 
 	if st.button('confirma',):
 		st.info('Executando Chrome')
-		ui_caminhar_chat()
+		ui_login()
 
 
 
