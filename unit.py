@@ -208,8 +208,7 @@ def ui_lista_contatos():
 	return contatos
 
 
-
-st.markdown(literais.css_botao_boneca_russa, unsafe_allow_html=True)
+st.markdown(literais.css_button_side_by_side, unsafe_allow_html=True)
 
 with st.container():
 	

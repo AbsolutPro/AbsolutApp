@@ -13,17 +13,16 @@ st.set_page_config(page_title='Ace Editor', layout='wide',initial_sidebar_state=
 		 'About': "App para automação whatsapp"
 	}
 )
-THEMES = ["ambiance", "chaos", "chrome", "clouds", "clouds_midnight", "cobalt", "crimson_editor", "dawn", "dracula", "dreamweaver", "eclipse", "github", "gob", "gruvbox", "idle_fingers", "iplastic","katzenmilch", "kr_theme", "kuroir", "merbivore", "merbivore_soft", "mono_industrial", "monokai", "nord_dark", "pastel_on_dark", "solarized_dark", "solarized_light", "sqlserver", "terminal","textmate", "tomorrow", "tomorrow_night", "tomorrow_night_blue", "tomorrow_night_bright", "tomorrow_night_eighties", "twilight", "vibrant_ink", "xcode"]
-
-my_theme = st.sidebar.selectbox('themes', THEMES)
+my_laguage = st.sidebar.selectbox('languages', literais.LANGUAGES)
+my_theme = st.sidebar.selectbox('themes', literais.THEMES)
 # Display editor's content as you type
 
 def list_files():
     cwd = os.getcwd()
     onlyfiles = [os.path.join(cwd, f) for f in os.listdir(cwd) if os.path.isfile(os.path.join(cwd, f))]
-
-    #print(f'DIRETORIO {cwd}\n {onlyfiles}')
-    return onlyfiles
+    onlyfiles_ = [os.path.join(cwd, f) for f in os.listdir(cwd) if os.path.isfile(os.path.join(cwd, f)) and f[-2:] =="py"]
+    #print(f'DIRETORIO {cwd}\n {onlyfiles_}')
+    return onlyfiles_
 def file_reader(arquivo):
     with open(arquivo, 'r', encoding='utf-8') as arqv:
         tudo = arqv.read()
@@ -31,7 +30,7 @@ def file_reader(arquivo):
 
 st.header("Aws dog editor")
 arquivo_selecionado = st.selectbox('list python scripts', list_files())
-content = st_ace(value=file_reader(arquivo_selecionado),height=800,theme=my_theme,language="python",)
+content = st_ace(value=file_reader(arquivo_selecionado),height=800,theme=my_theme,language=my_laguage,)
 
 
 st.sidebar.header("Observador")
