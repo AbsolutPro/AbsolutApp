@@ -47,8 +47,8 @@ def listar_nomes_desc(content):
 class Cliente:
 	"""
 		Faz login no whats
-		:param driver: The selenium driver
-		:type driver: object
+		param driver: The selenium driver
+		type driver: object
 	"""
 	google = None
 	URL = 'https://web.whatsapp.com/'
@@ -346,6 +346,7 @@ class Cliente:
 				contagem +=1
 				time.sleep(1)
 			self.google.quit()
+	
 	def ultima_conversa(self, contatos_):#dataframe['contatos'], text-img.txt
 		ate_o_fim = True
 		self.google.get(self.URL)
