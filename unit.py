@@ -208,14 +208,14 @@ def ui_lista_contatos():
 	return contatos
 
 
-st.markdown(literais.css_button_side_by_side, unsafe_allow_html=True)
+#st.markdown(literais.css_button_side_by_side, unsafe_allow_html=True)
 
 with st.container():
 	
 	if st.button('LOGIN', ):
 		#on_click=send_to_clipboard('imagem-0.png')
 		
-		st.info(f'Login CHECK {ui_login()}')
+		st.info(f'Login : {ui_login()}')
 
 	if st.button('CHAT LISTA',):
 		st.info('Executando Chrome')

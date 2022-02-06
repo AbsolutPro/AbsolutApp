@@ -65,19 +65,80 @@ LANGUAGES = [
 
 css_code_tres_botoes_lado_a_lado = '''
 <style>
-#root > div:nth-child(1) > div > div > div > div > section.main.css-1v3fvcr.eknhn3m1 > div > div:nth-child(1) > div > div > div:nth-child(2) > div:nth-child(1) > div > div:nth-child(3) > div {
+#root > div:nth-child(1) > div > div > div > div > section.main.css-1v3fvcr.egzxvld1 > div > div:nth-child(1) > div > div > div:nth-child(2) > div:nth-child(1) > div > div:nth-child(3) > div{
 	display: -webkit-inline-box!important;
 	width: 180px!important;
 }
-#root > div:nth-child(1) > div > div > div > div > section.main.css-1v3fvcr.eknhn3m1 > div > div:nth-child(1) > div > div > div:nth-child(2) > div:nth-child(1) > div > div:nth-child(3) > div > div:nth-child(-n+3) {
-	width: 50px!important;
+
+#root > div:nth-child(1) > div > div > div > div > section.main.css-1v3fvcr.egzxvld1 > div > div:nth-child(1) > div > div > div:nth-child(2) > div:nth-child(1) > div > div:nth-child(3) > div > div:nth-child(1){
+  max-width:  50px!important;
 }
-#root > div:nth-child(1) > div > div > div > div > section.main.css-1v3fvcr.eknhn3m1 > div > div:nth-child(1) > div > div > div:nth-child(2) > div:nth-child(1) > div > div:nth-child(3) > div > div:nth-child(-n+3) > div{
-	width: 50px!important;
+#root > div:nth-child(1) > div > div > div > div > section.main.css-1v3fvcr.egzxvld1 > div > div:nth-child(1) > div > div > div:nth-child(2) > div:nth-child(1) > div > div:nth-child(3) > div > div:nth-child(1) > div{
+  max-width:  50px!important;
 }
-#root > div:nth-child(1) > div > div > div > div > section.main.css-1v3fvcr.eknhn3m1 > div > div:nth-child(1) > div > div > div:nth-child(2) > div:nth-child(1) > div > div:nth-child(3) > div > div:nth-child(-n+3) > div > button{
-	width: fit-content;
+#root > div:nth-child(1) > div > div > div > div > section.main.css-1v3fvcr.egzxvld1 > div > div:nth-child(1) > div > div > div:nth-child(2) > div:nth-child(1) > div > div:nth-child(3) > div > div:nth-child(1) > div > div{
+  max-width:  50px!important;
 }
+#root > div:nth-child(1) > div > div > div > div > section.main.css-1v3fvcr.egzxvld1 > div > div:nth-child(1) > div > div > div:nth-child(2) > div:nth-child(1) > div > div:nth-child(3) > div > div:nth-child(1) > div > div > div.css-6dnr6u.edgvbvh8{
+  max-width:  50px!important;
+}
+#root > div:nth-child(1) > div > div > div > div > section.main.css-1v3fvcr.egzxvld1 > div > div:nth-child(1) > div > div > div:nth-child(2) > div:nth-child(1) > div > div:nth-child(3) > div > div:nth-child(1) > div > div > div.css-6dnr6u.edgvbvh8 > div{
+  max-width:  50px!important;
+}
+#bui-93__anchor{
+  max-width:  50px!important;
+}
+#bui-93__anchor > button{
+  max-width:  50px!important;
+}
+
+
+#root > div:nth-child(1) > div > div > div > div > section.main.css-1v3fvcr.egzxvld1 > div > div:nth-child(1) > div > div > div:nth-child(2) > div:nth-child(1) > div > div:nth-child(3) > div > div:nth-child(2)
+{max-width:  50px!important;}
+
+#root > div:nth-child(1) > div > div > div > div > section.main.css-1v3fvcr.egzxvld1 > div > div:nth-child(1) > div > div > div:nth-child(2) > div:nth-child(1) > div > div:nth-child(3) > div > div:nth-child(2) > div
+{max-width:  50px!important;}
+
+#root > div:nth-child(1) > div > div > div > div > section.main.css-1v3fvcr.egzxvld1 > div > div:nth-child(1) > div > div > div:nth-child(2) > div:nth-child(1) > div > div:nth-child(3) > div > div:nth-child(2) > div > div
+{max-width:  50px!important;}
+
+#root > div:nth-child(1) > div > div > div > div > section.main.css-1v3fvcr.egzxvld1 > div > div:nth-child(1) > div > div > div:nth-child(2) > div:nth-child(1) > div > div:nth-child(3) > div > div:nth-child(2) > div > div > div.css-6dnr6u.edgvbvh8
+{max-width:  50px!important;}
+
+#root > div:nth-child(1) > div > div > div > div > section.main.css-1v3fvcr.egzxvld1 > div > div:nth-child(1) > div > div > div:nth-child(2) > div:nth-child(1) > div > div:nth-child(3) > div > div:nth-child(2) > div > div > div.css-6dnr6u.edgvbvh8 > div
+{max-width:  50px!important;}
+
+#bui-94__anchor
+{max-width:  50px!important;}
+
+#bui-94__anchor > button
+{max-width:  50px!important;}
+
+
+#root > div:nth-child(1) > div > div > div > div > section.main.css-1v3fvcr.egzxvld1 > div > div:nth-child(1) > div > div > div:nth-child(2) > div:nth-child(1) > div > div:nth-child(3) > div > div:nth-child(3){
+  max-width:  50px!important;
+}
+
+#root > div:nth-child(1) > div > div > div > div > section.main.css-1v3fvcr.egzxvld1 > div > div:nth-child(1) > div > div > div:nth-child(2) > div:nth-child(1) > div > div:nth-child(3) > div > div:nth-child(3) > div
+{max-width:  50px!important;}
+
+#root > div:nth-child(1) > div > div > div > div > section.main.css-1v3fvcr.egzxvld1 > div > div:nth-child(1) > div > div > div:nth-child(2) > div:nth-child(1) > div > div:nth-child(3) > div > div:nth-child(3) > div > div
+{max-width:  50px!important;}
+
+#root > div:nth-child(1) > div > div > div > div > section.main.css-1v3fvcr.egzxvld1 > div > div:nth-child(1) > div > div > div:nth-child(2) > div:nth-child(1) > div > div:nth-child(3) > div > div:nth-child(3) > div > div > div.css-6dnr6u.edgvbvh8
+{max-width:  50px!important;}
+
+#root > div:nth-child(1) > div > div > div > div > section.main.css-1v3fvcr.egzxvld1 > div > div:nth-child(1) > div > div > div:nth-child(2) > div:nth-child(1) > div > div:nth-child(3) > div > div:nth-child(3) > div > div > div.css-6dnr6u.edgvbvh8 > div
+{max-width:  50px!important;}
+
+#bui-95__anchor
+{max-width:  50px!important;}
+
+#bui-95__anchor > button
+{max-width:  50px!important;}
+
+
+
 </style>
 '''
 

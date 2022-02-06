@@ -132,7 +132,7 @@ class Cliente:
 				else:
 					is_ctt_not_end = False
 				#ctt_selected.click()
-				time.sleep(1)
+				#time.sleep(1)
 			back_to_main = wait.until(EC.presence_of_element_located(GetLocator.BACK_BTN))
 			back_to_main.click()
 			cttss = list(dict.fromkeys(lista_inter))
@@ -166,7 +166,7 @@ class Cliente:
 					ctt_nome_anterior = selected_name[0]
 				else:
 					is_chat_not_end = False
-				time.sleep(3)
+				#time.sleep(3)
 			chat_ctts = list(dict.fromkeys(chat_ctts))
 			return chat_ctts
 
@@ -232,10 +232,11 @@ class Cliente:
 					finally:
 						pass
 					try:
-						espaco_enviar = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="app"]/div[1]/div[1]/div[2]/div[2]/span/div[1]/span/div[1]/div/div[2]/div/div[1]/div[3]/div/div/div[2]/div[1]/div[2]')))
-						espaco_enviar.send_keys(texto_p_enviar) #texto para enviar
 						
-						botao_enviar = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="main"]/footer/div[1]/div/span[2]/div/div[2]/div[2]/button')))
+						espaco_enviar = wait.until(EC.presence_of_element_located(GetLocator.ENTRADA_ENVIAR_MSG))
+						espaco_enviar.send_keys(texto_p_enviar) #texto para enviar
+
+						botao_enviar = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="app"]/div[1]/div[1]/div[2]/div[2]/span/div[1]/span/div[1]/div/div[2]/div/div[2]/div[2]/div/div')))
 						botao_enviar.click()
 						#BOTAO enviar
 					except Exception as e:
@@ -395,54 +396,48 @@ class GetLocator(object):
 	
 	O_BETA = (By.XPATH, '//*[@id="side"]/header/div[1]/div[2]/b')
 	"""
-		:span: TEXTO 'beta'
+		span: TEXT 'beta'
 	"""
 	
 	BTN_CHAT = (By.XPATH, '//*[@id="side"]/header/div[2]/div/span/div[2]/div')
 	"""
-		:div: BOTAO 'contatos'
+		button: DIV
 	"""
 	#tab_index_contact_key     //*[@id="app"]/div[1]/div[1]/div[2]/div[1]/span/div[1]/span/div[1]/div[2]/div[2]
 	CTT_LIST_BOX = (By.XPATH, '//*[@id="app"]/div[1]/div[1]/div[2]/div[1]/span/div[1]/span/div[1]/div[2]/div[2]/div/div')
 	"""
-		:div: BLOCO 'CONTATO-BLOCO'
-	"""
-
-	CTT_IDX = (By.XPATH, '//*[@id="app"]/div[1]/div[1]/div[2]/div[1]/span/div[1]/span/div[1]/div[2]/div[1]/div/div/div[12]/div/div/div[2]/div[1]/div/span/span')
-	"""
-		:span: TITLE 'CONTATO_NOME'
+		block: DIV
 	"""
 
 	CTT_BLOC = (By.XPATH , '//*[@id="app"]/div[1]/div[1]/div[2]/div[1]/span/div[1]/span/div[1]/div[2]/div[2]')
 	"""
-		:div: BLOCO 'CONTATOS'
+		block: DIV
 	"""
 
 	SEARCH_INPUT = (By.XPATH, '//*[@id="side"]/div[1]/div/label/div/div[2]')
 	"""
-		:div: INPUT
+		input: DIV
 	"""
 	CHAT_BLOC = (By.XPATH, '//*[@id="pane-side"]/div[2]')
 	"""
-		::
+		block: DIV
 	"""
 	BACK_BTN = (By.XPATH, '//*[@id="app"]/div[1]/div[1]/div[2]/div[1]/span/div[1]/span/div[1]/header/div/div[1]/button')
 	
 	"""
-		:button: BUTTON
+		input: BUTTON
 	"""
 	CLEAR_BUTTON = (By.XPATH, '//*[@id="side"]/div[1]/div/button')
 	"""
-		:div: IN //*[@id="pane-side"]/div[1]/div/div
+		input: BUTTON
 	"""
-								 #//*[@id="pane-side"]/div[1]/div/div/div[6]/div/div
-								 #//*[@id="pane-side"]/div[1]/div/div
-	SELECT_CHAT_BOX = (By.XPATH, '//*[@id="pane-side"]/div[1]/div/div')
-	"""
-		:div: TEXTBOX
-	"""
+
 	TEXT_BOX_CHAT = (By.XPATH,'//*[@id="main"]/footer/div[1]/div/span[2]/div/div[2]/div[1]/div/div[2]')
 	
 	"""
-		:chat: CLASS
+		block: DIV
+	"""
+	ENTRADA_ENVIAR_MSG = (By.XPATH, '//*[@id="app"]/div[1]/div[1]/div[2]/div[2]/span/div[1]/span/div[1]/div/div[2]/div/div[1]/div[3]/div/div/div[2]/div[1]/div[2]')
+	"""
+		input: DIV
 	"""

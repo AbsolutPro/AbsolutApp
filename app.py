@@ -44,13 +44,9 @@ st.set_page_config(
 	}
 )
 
-
-
 if "contatos_salvos" not in st.session_state: st.session_state["contatos_salvos"] = pd.DataFrame([''], columns=['contatos'])
 
-if "beta_on" not in st.session_state: st.session_state["beta_on"] = ""
-
-if "wusername" not in st.session_state: st.session_state["wusername"] = "Public"
+if "beta_on" not in st.session_state: st.session_state["beta_on"] = "nada"
 
 if "black_list" not in st.session_state: st.session_state["black_list"] =  []
 
@@ -67,7 +63,7 @@ try:
 except Exception as e:
 	st.info('A lista Online está denificada. Recarregue a página')
 
-st.sidebar.write(st.session_state['beta_on'])
+st.sidebar.write(f"ESTADO? {st.session_state['beta_on']}")
 
 st.sidebar.markdown('____')
 st.sidebar.subheader('Lista Contatos Online')
@@ -84,7 +80,6 @@ editavel = st.sidebar.radio("Modo Edição", [True, False], help='Para habilitar
 available_themes = ["streamlit", "light", "dark", "blue", "fresh", "material"]
 selected_theme = st.sidebar.selectbox("Tema", available_themes)
 
-st.session_state["wusername"] = st.sidebar.text_input("Usuário", placeholder='SouCliente', help='Nome do usuário Windows C:\\Users\\SouCliente\\ ')
 
 #endregion
 
@@ -179,7 +174,9 @@ def grade():
 if abrir or st.session_state.beta_on == 'BETA':
 	
 	opts = Options()
-	opts.add_argument(F"--user-data-dir=C:\\Users\\{st.session_state['wusername']}\\AppData\\Local\\Google\\Chrome\\User Data\\Profile 4")
+	
+	moss_do_ceu = f'--user-data-dir=C:\\Users\\Victor\\AppData\\Local\\Google\\Chrome\\User Data\\Profile 4'
+	opts.add_argument(moss_do_ceu)#(fr"--user-data-dir=C:\\Users\\{st.session_state.pc_user}\\AppData\\Local\\Google\\Chrome\\User Data\\Profile 4")
 	opts.add_experimental_option("detach", True)
 	#opts.add_argument("--headless")
 	try:
@@ -212,13 +209,25 @@ if abrir or st.session_state.beta_on == 'BETA':
 						
 					if content:
 						if os.name == 'nt':
-							if len(listar_imgs) > 0:
+							#se primeira image existir não entrar novamente para salvar o print
+							#and not os.path.isfile(f'image-0.{listar_imgs[0][0]}')
+							if len(listar_imgs) > 0 and not enviar:
+								
+								po_si = 0
+								for _ in listar_imgs:# os.listdir(os.getcwd()):
+									if os.path.exists(os.path.abspath(f"imagem-{0}.{listar_imgs[po_si][0]}")) is True:
+										imagem_nome = f"imagem-{po_si}.{listar_imgs[po_si][0]}"
+										os.remove(os.path.abspath(imagem_nome))
+										po_si += 1
+										print('removi as anteriores primeiro')
+								
+								print(f'ok.. {os.path.abspath(f"imagem-{0}.{listar_imgs[0][0]}")}')
 								pos = 0
 								for _ in listar_imgs:	#cria as imagens localmente
 									with open(f"imagem-{pos}.{listar_imgs[pos][0]}", 'wb') as wrb:
 										wrb.write(b64decode(listar_imgs[pos][1]))
-									send_to_clipboard(f"imagem-0.png")
-									
+									send_to_clipboard(f"imagem-0.{listar_imgs[pos][0]}")
+									print(f'anexei UMA IMAGEM instantaneamente.  {listar_imgs[pos][0]}')
 									pos += 1
 							else:
 								st.markdown('____')
@@ -252,6 +261,7 @@ if abrir or st.session_state.beta_on == 'BETA':
 				st.session_state.beta_on = cliente.login()
 				try:
 					st.session_state.contatos_salvos = pd.read_csv("contatos.csv")
+					#print('falhando aqui?')
 				except Exception as e:
 					temp_chat_list = cliente.chats_ctt()
 					temp_chat_list += cliente.contatos()
@@ -273,7 +283,7 @@ if abrir or st.session_state.beta_on == 'BETA':
 		if "user data directory is already in use" in str(e):
 			st.error("feche a janela do whats aberta anteriormente. Recarregue a página e tente novamente.")
 		elif "Ordinal0" in str(e):
-			st.info(f'algum item não foi encontrado durante o envio')
+			st.info(e)
 			st.info(f'você pode refazer a operação excluindo o contatos virtuais já vistos')
 		else:
 			st.info(f'Já definimos o cliente e os contatos. Erro: {e}')
