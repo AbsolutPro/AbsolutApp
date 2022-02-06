@@ -190,17 +190,20 @@ class Cliente:
 				contagem = 0
 
 				while ate_o_fim:
+					self.google.get(self.URL)
 					if contagem >= len(contatos_['contatos']) - 1: ate_o_fim = False
 					
 					btn_search = wait.until(EC.presence_of_element_located(GetLocator.SEARCH_INPUT))
 					btn_search.click()
-
-					btn_search.send_keys(contatos_['contatos'][contagem])
-					time.sleep(1)
+					nome_de_fato = str(contatos_['contatos'][contagem])
+					btn_search.send_keys(nome_de_fato)
+					btn_search.click()
+					print(f"CONTATO {contatos_['contatos'][contagem]}")
+					time.sleep(3)
 
 					btn_search.send_keys(Keys.ARROW_DOWN)
 
-					time.sleep(1)
+					time.sleep(3)
 					ctt_selected = wait.until(EC.presence_of_element_located((By.CLASS_NAME, '_2_TVt')))
 					ctt_selected.click()
 					time.sleep(1)
@@ -212,18 +215,18 @@ class Cliente:
 					try:
 						espaco_enviar = wait.until(EC.presence_of_element_located(GetLocator.TEXT_BOX_CHAT))
 						espaco_enviar.click()
-						time.sleep(2)
+						time.sleep(1)
 
 						pos = 0# CTRL + C
 						for _ in listar_imgs:
 							img_name = f"imagem-{pos}.{listar_imgs[pos][0]}"#posição da extensao da img POS
 							print(f'NOME DAS IMAGENS: {img_name} ')
 							#self.img_para_ctrl_c(img_name)
-							time.sleep(2)
+							time.sleep(1)
 							actions = ActionChains(self.google)
 							#espaco_enviar.send_keys(Keys.CONTROL, 'v')
 							actions.key_down(Keys.CONTROL).send_keys('v').key_up(Keys.CONTROL).perform()
-							time.sleep(10)
+							time.sleep(1)
 							print(f'CRTL V já foi 1º: {img_name} ')
 							#actions.key_down(Keys.CONTROL).send_keys('z').key_up(Keys.CONTROL).perform()
 							#actions.key_down(Keys.CONTROL).send_keys('v').key_up(Keys.CONTROL).perform()
@@ -238,6 +241,7 @@ class Cliente:
 
 						botao_enviar = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="app"]/div[1]/div[1]/div[2]/div[2]/span/div[1]/span/div[1]/div/div[2]/div/div[2]/div[2]/div/div')))
 						botao_enviar.click()
+						time.sleep(3)
 						#BOTAO enviar
 					except Exception as e:
 						print(f'FALHA AO DIGITAR MENSAGEM {e}')
@@ -245,6 +249,7 @@ class Cliente:
 						pass
 
 					contagem += 1
+					print(f'contagem de contatos {contagem}')
 
 				self.google.quit()
 					

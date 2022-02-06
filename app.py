@@ -216,23 +216,23 @@ if abrir or st.session_state.beta_on == 'BETA':
 								po_si = 0
 								for _ in listar_imgs:# os.listdir(os.getcwd()):
 									if os.path.exists(os.path.abspath(f"imagem-{0}.{listar_imgs[po_si][0]}")) is True:
-										imagem_nome = f"imagem-{po_si}.{listar_imgs[po_si][0]}"
-										os.remove(os.path.abspath(imagem_nome))
+										os.remove(os.path.abspath(f"imagem-{0}.{listar_imgs[po_si][0]}"))
 										po_si += 1
-										print('removi as anteriores primeiro')
+										print('removi as IMAGENS anteriores primeiro')
 								
-								print(f'ok.. {os.path.abspath(f"imagem-{0}.{listar_imgs[0][0]}")}')
+								#print(f'ok.. {os.path.abspath(f"imagem-{0}.{listar_imgs[0][0]}")}')
 								pos = 0
 								for _ in listar_imgs:	#cria as imagens localmente
 									with open(f"imagem-{pos}.{listar_imgs[pos][0]}", 'wb') as wrb:
 										wrb.write(b64decode(listar_imgs[pos][1]))
 									send_to_clipboard(f"imagem-0.{listar_imgs[pos][0]}")
-									print(f'anexei UMA IMAGEM instantaneamente.  {listar_imgs[pos][0]}')
+									#print(f'anexei UMA IMAGEM instantaneamente.  {listar_imgs[pos][0]}')
 									pos += 1
 							else:
-								st.markdown('____')
-								st.markdown(content, unsafe_allow_html=True)
-								st.markdown('____')
+								pass
+								#st.markdown('____')
+								#st.markdown(content, unsafe_allow_html=True)
+								#st.markdown('____')
 						elif os.name == 'posix':
 								st.markdown('____')
 								st.markdown(content, unsafe_allow_html=True)
@@ -261,6 +261,8 @@ if abrir or st.session_state.beta_on == 'BETA':
 				st.session_state.beta_on = cliente.login()
 				try:
 					st.session_state.contatos_salvos = pd.read_csv("contatos.csv")
+					if st.session_state.contatos_salvos.empty():
+						raise Exception("FALHA CRIADA NO APLICATIVO")
 					#print('falhando aqui?')
 				except Exception as e:
 					temp_chat_list = cliente.chats_ctt()

@@ -1,4 +1,5 @@
 #region IMPORTS
+import pandas as pd
 import streamlit as st
 import os
 if os.name == 'nt':
@@ -38,6 +39,11 @@ st.set_page_config(
 		 'About': "App para automação whatsapp"
 	}
 )
+
+if "contatos_salvos" not in st.session_state: st.session_state["contatos_salvos"] = pd.DataFrame([''], columns=['contatos'])
+
+if "contatos_list" not in st.session_state: st.session_state["contatos_list"] = []
+
 
 def listar_nomes_desc(content):
 	desc_ = re.findall(r'_1qB8f"><span dir="auto" title="(.*?)" class="fd365im1', content)
@@ -105,7 +111,7 @@ def ui_lista_chat():
 	chat_ctts = list(dict.fromkeys(chat_ctts))
 	return chat_ctts
 
-def ui_buscar():
+def ui_buscar(dataframe):
 	#send_to_clipboard(f'imagem-0.png')
 	opts = Options()
 	opts.add_argument("--user-data-dir=C:\\Users\\Victor\\AppData\\Local\\Google\\Chrome\\User Data\\Profile 4")
@@ -133,11 +139,12 @@ def ui_buscar():
 	#TEXT_BOX_CHAT
 	espaco_enviar.send_keys('')
 
-	time.sleep(5)
+	time.sleep(1)
 
 	actions = ActionChains(driver)
 	actions.key_down(Keys.CONTROL).send_keys('v').key_up(Keys.CONTROL).perform()
-	time.sleep(10)
+	time.sleep(5)
+	driver.quit()
 
 def ui_enviar_imagem():
 	#send_to_clipboard(f'imagem-0.png')
@@ -207,11 +214,50 @@ def ui_lista_contatos():
 	contatos = list(dict.fromkeys(lista_inter))
 	return contatos
 
+def ui_ultima_conversa( contatos_):#dataframe['contatos'], text-img.txt
+	ate_o_fim = True
+	opts = Options()
+	opts.add_argument("--user-data-dir=C:\\Users\\Victor\\AppData\\Local\\Google\\Chrome\\User Data\\Profile 4")
+	driver = webdriver.Chrome(options=opts)#options=opts ---headless
+	driver.get('https://web.whatsapp.com/')
+	driver.maximize_window()
+	
 
-#st.markdown(literais.css_button_side_by_side, unsafe_allow_html=True)
+	contatos_['contatos']#contato1,contato2 LIST
+	for cada in contatos_['contatos']:
+		pass
+
+	wait = WebDriverWait(driver, 60)
+	contagem = 0
+
+	while ate_o_fim:
+		if contagem >= len(contatos_['contatos']) - 1: ate_o_fim = False
+		try:#abrir janela clicar em pesquisa. esperar item carregado
+			driver.get('https://web.whatsapp.com/')
+
+			btn_search = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="side"]/div[1]/div/label/div/div[2]')))
+			btn_search.click()
+			btn_search.send_keys(contatos_['contatos'][contagem])
+			time.sleep(.1)
+			
+		except Exception as e:
+			print(f'envia_msg -- ERROR {e}')
+		finally:
+			time.sleep(0.1)
+
+			info_ultimo_contato = wait.until(EC.presence_of_element_located((By.CLASS_NAME, '_1i_wG')))
+			print(f'{contatos_["contatos"][contagem]} < ULTIMA conversa > {info_ultimo_contato.text}')
+			btn_clear = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="side"]/div[1]/div/button')))
+			btn_clear.click()
+			contagem +=1
+			time.sleep(.1)
+	driver.quit()
+
 
 with st.container():
-	
+	st.subheader('Contatos')
+	st.write(st.session_state.contatos_salvos)
+	st.write(st.session_state.contatos_list)
 	if st.button('LOGIN', ):
 		#on_click=send_to_clipboard('imagem-0.png')
 		
@@ -219,11 +265,25 @@ with st.container():
 
 	if st.button('CHAT LISTA',):
 		st.info('Executando Chrome')
-		st.write(ui_lista_chat())
 
-	if st.button('CONTATOS LISTA',):
+		st.session_state.contatos_list += ui_lista_chat()
+
+		st.session_state.contatos_list = list(dict.fromkeys(st.session_state.contatos_list))
+		
+		st.session_state.contatos_salvos = pd.DataFrame(st.session_state.contatos_list, columns=['contatos'])
+
+		st.experimental_rerun()
+
+	if st.button('CONTATOS SALVOS LISTA',):
 		st.info('Executando Chrome')
-		st.write(ui_lista_contatos())
+
+		st.session_state.contatos_list += ui_lista_contatos()
+
+		st.session_state.contatos_list = list(dict.fromkeys(st.session_state.contatos_list))
+
+		st.session_state.contatos_salvos = pd.DataFrame(st.session_state.contatos_list, columns=['contatos'])
+
+		st.experimental_rerun()
 
 	if st.button('BUSCA CONTATO',):
 		st.info('Executando Chrome')
@@ -233,3 +293,7 @@ with st.container():
 	if st.button('ENVIA IMAGEM',):
 		st.info('Executando Chrome')
 		st.write(ui_enviar_imagem())
+
+	if st.button('ULTIMA CONVERSA',):
+		st.info('Executando Chrome')
+		st.write(ui_ultima_conversa(st.session_state.contatos_salvos))
