@@ -43,11 +43,13 @@ st.set_page_config(
 	}
 )
 
-if "contatos_salvos" not in st.session_state: st.session_state["contatos_salvos"] = pd.DataFrame([''], columns=['contatos'])
+if "contatos_salvos" not in st.session_state: st.session_state["contatos_salvos"] = pd.DataFrame([], columns=['contatos'])
 
 if "contatos_list" not in st.session_state: st.session_state["contatos_list"] = []
 
-if "contatos_see_info" not in st.session_state: st.session_state["contatos_see_info"] = []
+if "ultima_conversa" not in st.session_state: st.session_state["ultima_conversa"] = []
+
+if "black_list" not in st.session_state: st.session_state["black_list"] =  []
 
 def html_to_wppedit(raw_html):
 	negrito = re.compile('(<strong>|</strong>)')
@@ -78,12 +80,28 @@ def listar_nomes(texto):
 	else:
 		return re.findall(r'<span dir="auto" title="(.*?)" class="gg', texto)
 
+def nome_localizado(texto):
+	#print(f'O TEXTO \n\n\n {texto}') '' "" `` 
+	title_name = re.search(r'"_3q9s6"><span dir="auto" title="(.*?)" class="g', texto)
+	if title_name:
+		return title_name
+	else:
+		return re.search(r'<span dir="auto" title="(.*?)" class="gg', texto)
+
+def extrair_info_ultima_conversa(texto):
+	info_last_talk = re.search(r'<div class="_1i_wG">(.*?)</div>',texto)
+
+	return info_last_talk
+
+
+
+
+
+
 def ui_login():
-	#send_to_clipboard(f'imagem-0.png')
 	opts = Options()
 	opts.add_argument("--user-data-dir=C:\\Users\\Victor\\AppData\\Local\\Google\\Chrome\\User Data\\Profile 4")
-	#opts.add_argument("---headless")
-	driver = webdriver.Chrome(options=opts)#options=opts ---headless executable_path='chromedriver.exe', 
+	driver = webdriver.Chrome(options=opts)
 	driver.get('https://web.whatsapp.com/')
 	driver.maximize_window()
 	wait = WebDriverWait(driver, 999)
@@ -95,12 +113,13 @@ def ui_login():
 	else:
 		return 'error'
 
+
+
 def ui_lista_chat():
 	chat_ctts = []
-	#send_to_clipboard(f'imagem-0.png')
+
 	opts = Options()
 	opts.add_argument("--user-data-dir=C:\\Users\\Victor\\AppData\\Local\\Google\\Chrome\\User Data\\Profile 4")
-	#opts.add_argument("---headless")
 	driver = webdriver.Chrome(options=opts)
 	driver.get('https://web.whatsapp.com/')
 	driver.maximize_window()
@@ -110,30 +129,86 @@ def ui_lista_chat():
 	btn_search.send_keys("")
 	chat_bloco = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="pane-side"]/div[2]')))
 	time.sleep(1)
-	#barra de busca
+
 	btn_search.send_keys(Keys.ARROW_DOWN)
-	#PRIMEIRA CONVERSA SELECIONADA
+
 	ctt_anterior = ''
 
 	is_chat_not_end = True
 	while is_chat_not_end:
-		#time.sleep(1)
+
 		ctt_selected = wait.until(EC.presence_of_element_located((By.CLASS_NAME, '_2_TVt')))
-		selected_name = listar_nomes(str(ctt_selected.get_attribute('innerHTML')))
-		chat_ctts += selected_name
-		print(f' \nSELECIONADO > {selected_name[0]}\n ')
-		print(f' \ctt anterior > {ctt_anterior}\n ')
+		selected_name = nome_localizado(str(ctt_selected.get_attribute('innerHTML')))
+
+		chat_ctts.append(selected_name.group(1))
+
 		if selected_name[0] != ctt_anterior:
 			ctt_anterior = selected_name[0]
 		else:
 			is_chat_not_end = False
 		chat_bloco.send_keys(Keys.ARROW_DOWN)
 
-	chat_ctts = list(dict.fromkeys(chat_ctts))
 	return chat_ctts
 
+
+def ui_lista_contatos():
+	contatos = []
+	
+	contato_anterior = ''
+	descricao_anterior = ''
+	fim_da_lista_contatos = True
+
+	opts = Options()
+	opts.add_argument("--user-data-dir=C:\\Users\\Victor\\AppData\\Local\\Google\\Chrome\\User Data\\Profile 4")
+	driver = webdriver.Chrome(options=opts)
+	driver.get('https://web.whatsapp.com/')
+	driver.maximize_window()
+	wait = WebDriverWait(driver, 60)
+
+	icone_ctts = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="side"]/header/div[2]/div/span/div[2]/div')))
+	icone_ctts.click()
+
+	ctt_blc = wait.until(EC.presence_of_element_located((By.XPATH , '//*[@id="app"]/div[1]/div[1]/div[2]/div[1]/span/div[1]/span/div[1]/div[2]/div[2]')))
+	ctt_blc.send_keys(Keys.ARROW_DOWN)
+	ctt_blc.send_keys(Keys.ARROW_UP)
+	while fim_da_lista_contatos:
+		#time.sleep(2)
+		
+		ctt_selecionado = wait.until(EC.presence_of_element_located((By.CLASS_NAME, '_2_TVt')))
+
+		nome_selecionado = nome_localizado(str(ctt_selecionado.get_attribute('innerHTML')))
+
+		descricao_nome_selecionado = listar_nomes_desc(str(ctt_selecionado.get_attribute('innerHTML')))
+
+		contatos.append(str(nome_selecionado.group(1)))
+		#lista_inter += nome_selecionado
+
+		if descricao_nome_selecionado:
+			print(f'\n\n tem descrição>  {descricao_nome_selecionado[0]}')
+		else:
+			descricao_nome_selecionado.append(str(f'descrição ausente-{str(nome_selecionado.group(1))[:2]}'))
+			print(f"\n\n NAO tem descricao> {str(f'descrição ausente-{str(nome_selecionado.group(1))[:2]}')}")
+		
+		if nome_selecionado[0] != contato_anterior or descricao_nome_selecionado[0] != descricao_anterior:
+			contato_anterior = nome_selecionado[0]
+			descricao_anterior = descricao_nome_selecionado[0]
+		else:
+			fim_da_lista_contatos = False
+		ctt_blc.send_keys(Keys.ARROW_DOWN)
+
+	back_to_main = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="app"]/div[1]/div[1]/div[2]/div[1]/span/div[1]/span/div[1]/header/div/div[1]/button')))
+	back_to_main.click()
+	contatos = list(dict.fromkeys(contatos))
+	
+	return contatos
+
+
+
+
+
+
+
 def ui_buscar(contatos_):
-	#send_to_clipboard(f'imagem-0.png')
 	opts = Options()
 	opts.add_argument("--user-data-dir=C:\\Users\\Victor\\AppData\\Local\\Google\\Chrome\\User Data\\Profile 4")
 	driver = webdriver.Chrome(options=opts)#options=opts ---headless
@@ -142,7 +217,6 @@ def ui_buscar(contatos_):
 	wait = WebDriverWait(driver, 60)
 	contagem = 0
 	ate_o_fim = True
-
 	while ate_o_fim:
 		if contagem >= len(contatos_['contatos']) - 1: ate_o_fim = False
 		try:
@@ -150,37 +224,28 @@ def ui_buscar(contatos_):
 			btn_search = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="side"]/div[1]/div/label/div/div[2]')))
 			btn_search.click()
 			btn_search.send_keys(contatos_['contatos'][contagem])
-			time.sleep(.51)
+			time.sleep(0.51)
+			btn_search.send_keys(Keys.ARROW_DOWN)
+			ctt_selected = wait.until(EC.presence_of_element_located((By.CLASS_NAME, '_2_TVt')))
+			ctt_selected.click()
 		except Exception as e:
-			print(f'envia_msg -- ERROR {e}')
+			st.error(f'{e}')
 		finally:
-			time.sleep(0.21)
+			time.sleep(0.51)
 			btn_clear = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="side"]/div[1]/div/button')))
 			btn_clear.click()
 			contagem +=1
 			time.sleep(.21)
 	driver.quit()
-	
 
 
-	btn_search.send_keys(Keys.ARROW_DOWN)
-	time.sleep(3)
-	ctt_selected = wait.until(EC.presence_of_element_located((By.CLASS_NAME, '_2_TVt')))
-	ctt_selected.click()
-	time.sleep(1)
-	btn_clear = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="side"]/div[1]/div/button')))
-	#CLEAR_BUTTON
-	btn_clear.click()
-	espaco_enviar = wait.until(EC.presence_of_element_located((By.XPATH,'//*[@id="main"]/footer/div[1]/div/span[2]/div/div[2]/div[1]/div/div[2]')))
-	#TEXT_BOX_CHAT
-	espaco_enviar.send_keys('')
 
-	time.sleep(1)
 
-	actions = ActionChains(driver)
-	actions.key_down(Keys.CONTROL).send_keys('v').key_up(Keys.CONTROL).perform()
-	time.sleep(5)
-	driver.quit()
+
+
+
+
+
 
 def ui_enviar_imagem(contatos_,mensagem):
 	ate_o_fim = True
@@ -201,13 +266,9 @@ def ui_enviar_imagem(contatos_,mensagem):
 			btn_search = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="side"]/div[1]/div/label/div/div[2]')))
 			btn_search.click()
 			btn_search.send_keys(contatos_['contatos'][contagem])
-
-			info_ultimo_contato = wait.until(EC.presence_of_element_located((By.CLASS_NAME, '_1i_wG')))
-			print(f'{contatos_["contatos"][contagem]} < ULTIMA conversa > {info_ultimo_contato.text}')
+			time.sleep(0.51)
 			btn_search.send_keys(Keys.ARROW_DOWN)
 			ctt_selecionado = wait.until(EC.presence_of_element_located((By.CLASS_NAME, '_2_TVt')))
-
-			time.sleep(1)
 			ctt_selecionado.click()
 
 			if bool(listar_imgs):
@@ -215,7 +276,7 @@ def ui_enviar_imagem(contatos_,mensagem):
 				espaco_enviar.send_keys('')
 				actions = ActionChains(driver)
 				actions.key_down(Keys.CONTROL).send_keys('v').key_up(Keys.CONTROL).perform()
-				time.sleep(5)
+				time.sleep(3)
 				espaco_enviar = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="app"]/div[1]/div[1]/div[2]/div[2]/span/div[1]/span/div[1]/div/div[2]/div/div[1]/div[3]/div/div/div[2]/div[1]/div[2]')))
 				espaco_enviar.send_keys(texto_p_enviar) #texto para enviar
 				time.sleep(5)
@@ -246,73 +307,25 @@ def ui_enviar_imagem(contatos_,mensagem):
 	time.sleep(1)
 	driver.quit()
 
-def ui_lista_contatos():
-	contatos = []
-	contato_anterior = ''
-	descricao_anterior = ''
-	fim_da_lista_contatos = True
 
-	opts = Options()
-	opts.add_argument("--user-data-dir=C:\\Users\\Victor\\AppData\\Local\\Google\\Chrome\\User Data\\Profile 4")
-	driver = webdriver.Chrome(options=opts)
-	driver.get('https://web.whatsapp.com/')
-	driver.maximize_window()
-	wait = WebDriverWait(driver, 60)
 
-	icone_ctts = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="side"]/header/div[2]/div/span/div[2]/div')))
-	icone_ctts.click()
 
-	box_lista_ctt = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="app"]/div[1]/div[1]/div[2]/div[1]/span/div[1]/span/div[1]/div[2]/div[2]/div/div')))
 
-	conteudo_list_ctt = str(box_lista_ctt.get_attribute('innerHTML'))
 
-	contatos = listar_nomes(conteudo_list_ctt)
 
-	ctt_blc = wait.until(EC.presence_of_element_located((By.XPATH , '//*[@id="app"]/div[1]/div[1]/div[2]/div[1]/span/div[1]/span/div[1]/div[2]/div[2]')))
 
-	lista_inter = contatos
-
-	while fim_da_lista_contatos:
-		ctt_blc.send_keys(Keys.ARROW_DOWN)
-
-		ctt_selecionado = wait.until(EC.presence_of_element_located((By.CLASS_NAME, '_2_TVt')))
-
-		nome_selecionado = listar_nomes(str(ctt_selecionado.get_attribute('innerHTML')))
-
-		descricao_nome_selecionado = listar_nomes_desc(str(ctt_selecionado.get_attribute('innerHTML')))
-
-		lista_inter += nome_selecionado
-
-		if descricao_nome_selecionado:
-			print(f'\n\n descrição tem conteudo {descricao_nome_selecionado[0]}')
-		else:
-			descricao_nome_selecionado.append(str(f'descrição ausente-{str(nome_selecionado[0])[:2]}'))
-			print(f'\n\n NAO TEM descrição {nome_selecionado[0]}')
-		
-		if nome_selecionado[0] != contato_anterior or descricao_nome_selecionado[0] != descricao_anterior:
-			contato_anterior = nome_selecionado[0]
-			descricao_anterior = descricao_nome_selecionado[0]
-		else:
-			fim_da_lista_contatos = False
-	
-	back_to_main = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="app"]/div[1]/div[1]/div[2]/div[1]/span/div[1]/span/div[1]/header/div/div[1]/button')))
-	back_to_main.click()
-	contatos = list(dict.fromkeys(lista_inter))
-	return contatos
 
 def ui_ultima_conversa( contatos_):#dataframe['contatos'], text-img.txt
 	ate_o_fim = True
+	lista_contatos_info = []
+	lista_contatos_ = []
+
 	opts = Options()
 	opts.add_argument("--user-data-dir=C:\\Users\\Victor\\AppData\\Local\\Google\\Chrome\\User Data\\Profile 4")
 	driver = webdriver.Chrome(options=opts)#options=opts ---headless
 	driver.get('https://web.whatsapp.com/')
 	driver.maximize_window()
 	
-
-	#contatos_['contatos']#contato1,contato2 LIST
-	#for cada in contatos_['contatos']:
-	#	pass
-
 	wait = WebDriverWait(driver, 60)
 	contagem = 0
 
@@ -324,71 +337,193 @@ def ui_ultima_conversa( contatos_):#dataframe['contatos'], text-img.txt
 			btn_search = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="side"]/div[1]/div/label/div/div[2]')))
 			btn_search.click()
 			btn_search.send_keys(contatos_['contatos'][contagem])
-			time.sleep(.1)
+			time.sleep(.81)
+			btn_search.send_keys(Keys.ARROW_DOWN)
 			
 		except Exception as e:
 			print(f'envia_msg -- ERROR {e}')
 		finally:
-			time.sleep(0.1)
+			ctt_selected = wait.until(EC.presence_of_element_located((By.CLASS_NAME, '_2_TVt')))
+			ctt_selected.click()
+			selected_name = nome_localizado(str(ctt_selected.get_attribute('innerHTML')))
+			info_ultimo_contato = extrair_info_ultima_conversa(str(ctt_selected.get_attribute('innerHTML')))
+			
+			lista_contatos_info.append(str(info_ultimo_contato.group(1)))
+			lista_contatos_.append(selected_name.group(1))
 
-			info_ultimo_contato = wait.until(EC.presence_of_element_located((By.CLASS_NAME, '_1i_wG')))
-			print(f'{contatos_["contatos"][contagem]} < ULTIMA conversa > {info_ultimo_contato.text}')
+			
+
+			print(f'{selected_name.group(1)} < ULTIMA CONVERSA > {str(info_ultimo_contato.group(1))}')
+			time.sleep(.51)
+
 			btn_clear = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="side"]/div[1]/div/button')))
 			btn_clear.click()
 			contagem +=1
-			time.sleep(.1)
+			time.sleep(1)
 	driver.quit()
+	return lista_contatos_, lista_contatos_info
+
+
+
+
+def ui_ultima_conversa_chat( contatos_):#dataframe
+	ate_o_fim = True
+	opts = Options()
+	opts.add_argument("--user-data-dir=C:\\Users\\Victor\\AppData\\Local\\Google\\Chrome\\User Data\\Profile 4")
+	driver = webdriver.Chrome(options=opts)
+	driver.get('https://web.whatsapp.com/')
+	driver.maximize_window()
+	wait = WebDriverWait(driver, 60)
+	contagem = 0
+	lista_contatos_info = []
+	lista_contatos_ = []
+	btn_search = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="side"]/div[1]/div/label/div/div[2]')))
+	btn_search.click()
+	chat_bloco = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="pane-side"]/div[2]')))
+	btn_search.send_keys(Keys.ARROW_DOWN)
+	while ate_o_fim:
+		if contagem >= len(contatos_['contatos']) - 1: ate_o_fim = False
+		ctt_selected = wait.until(EC.presence_of_element_located((By.CLASS_NAME, '_2_TVt')))
+		ctt_selected.click()
+		selected_name = nome_localizado(str(ctt_selected.get_attribute('innerHTML')))
+		info_ultimo_contato = extrair_info_ultima_conversa(str(ctt_selected.get_attribute('innerHTML')))
+		print(f'\n\n\n{contatos_["contatos"][contagem]} - {info_ultimo_contato.group(1)}\n\n')
+		#info_ultimo_contato.group(1)
+		
+
+		lista_contatos_info.append(str(info_ultimo_contato.group(1)))
+		lista_contatos_.append(selected_name.group(1))#contatos_["contatos"][contagem])
+		contagem +=1
+		chat_bloco.send_keys(Keys.ARROW_DOWN)
+		time.sleep(1)
+	dataframe = pd.DataFrame(st.session_state["contatos_salvos"])
+	dataframe['contatos'] = lista_contatos_
+	dataframe['ultima conversa'] = lista_contatos_info
+	
+	st.session_state["contatos_salvos"]+= pd.DataFrame(dataframe)
+	driver.quit()
+	st.experimental_rerun()
+
+
+
+
+def ui_ultima_conversa_rapida( contatos_):#dataframe
+	ate_o_fim = True
+	opts = Options()
+	opts.add_argument("--user-data-dir=C:\\Users\\Victor\\AppData\\Local\\Google\\Chrome\\User Data\\Profile 4")
+	driver = webdriver.Chrome(options=opts)
+	driver.get('https://web.whatsapp.com/')
+	driver.maximize_window()
+	
+	wait = WebDriverWait(driver, 60)
+	contagem = 0
+	lista_contatos_info = []
+
+	while ate_o_fim:
+		if contagem >= len(contatos_['contatos']) - 1: ate_o_fim = False
+
+		btn_search = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="side"]/div[1]/div/label/div/div[2]')))
+		btn_search.click()
+		btn_search.send_keys(contatos_['contatos'][contagem])
+		time.sleep(1)
+		btn_search.send_keys(Keys.ARROW_DOWN)
+		ctt_selected = wait.until(EC.presence_of_element_located((By.CLASS_NAME, '_2_TVt')))
+		time.sleep(1)
+		ctt_selected.click()
+		info_ultimo_contato = extrair_info_ultima_conversa(str(ctt_selected.get_attribute('innerHTML')))
+
+		print(f'\n\n\n{contatos_["contatos"][contagem]} - {info_ultimo_contato.group(1)}\n\n')
+		info_ultimo_contato.group(1)
+		lista_contatos_info.append(info_ultimo_contato)
+		
+		
+		
+		btn_clear = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="side"]/div[1]/div/button')))
+		time.sleep(1)
+		btn_clear.click()
+		contagem +=1
+		
+	st.session_state["contatos_salvos"]['ultima conversa'] = lista_contatos_info
+	driver.quit()
+	return lista_contatos_info
 
 with st.container():
 	caixa = st.container()
 	caixa.subheader("Mensagem")
 	content = text_editor(placeholder="Escreva seu Newsletter Personalizado",html=caixa.checkbox("Entregar como HTML", True),readonly=caixa.checkbox("Apenas leitura", False),key="quill",)
 	listar_imgs = re.findall( r'src="data:image/(.*?);base64,(.*?)"', fr'{content}')
-	st.subheader('Contatos')
+	st.subheader('contato dos pandas')
+
 	st.write(st.session_state.contatos_salvos)
-	print(st.session_state.contatos_list)
+	st.write(st.session_state.contatos_list)
+	st.write(st.session_state.ultima_conversa)
+
+
 	if st.sidebar.button('LOGIN', ):
 		#on_click=send_to_clipboard('imagem-0.png')
 		
 		st.sidebar.info(f'Login : {ui_login()}')
 
-	if st.sidebar.button('CHAT LISTA',):
+	if st.sidebar.button('LISTA CHAT',):
 		st.sidebar.info('Executando Chrome')
-
-		st.session_state.contatos_list += ui_lista_chat()
-
-		st.session_state.contatos_list = list(dict.fromkeys(st.session_state.contatos_list))
 		
-		st.session_state.contatos_salvos = pd.DataFrame(st.session_state.contatos_list, columns=['contatos'])
+		st.session_state["contatos_list"]  += ui_lista_chat()
+
+		st.session_state["contatos_list"] = list(dict.fromkeys(st.session_state["contatos_list"]))
+
+		st.session_state.contatos_salvos['contatos'] = pd.DataFrame(st.session_state.contatos_list, columns=['contatos'])
 
 		st.experimental_rerun()
 
-	if st.sidebar.button('CONTATOS SALVOS LISTA',):
+	if st.sidebar.button('LISTA CONTATOS',):
 		st.sidebar.info('Executando Chrome')
 
-		st.session_state.contatos_list += ui_lista_contatos()
+		st.session_state["contatos_list"] += ui_lista_contatos()
 
-		st.session_state.contatos_list = list(dict.fromkeys(st.session_state.contatos_list))
-
-		st.session_state.contatos_salvos = pd.DataFrame(st.session_state.contatos_list, columns=['contatos'])
-
+		st.session_state["contatos_list"] = list(dict.fromkeys(st.session_state["contatos_list"]))
+		try:
+			st.session_state.contatos_salvos['contatos'] = pd.DataFrame(st.session_state.contatos_list, columns=['contatos'])
+		except Exception as e:
+			print('falha no resize')
 		st.experimental_rerun()
 
-	if st.sidebar.button('BUSCA CONTATO',):
+	if st.sidebar.button('BUSCA INDIVIDUAL',):
 		st.sidebar.info('Executando Chrome')
 		ui_buscar(st.session_state.contatos_salvos)
 
-
-	enviar = st.sidebar.button('ENVIA msg IMAGEM',)
+	enviar = st.sidebar.button('ENVIAR IMAGEM',)
 	if enviar:
 		st.sidebar.info('Executando Chrome')
 		ui_enviar_imagem(st.session_state.contatos_salvos,content)
-	
+
 	if len(listar_imgs) > 0  and not enviar:
 		with open(f"imagem-{0}.{listar_imgs[0][0]}", 'wb') as wrb:
 			wrb.write(b64decode(listar_imgs[0][1]))
 		send_to_clipboard(f"imagem-0.{listar_imgs[0][0]}")
-	
-	if st.sidebar.button('ULTIMA CONVERSA',):
+
+	if st.sidebar.button('ULTIMA CONVERSA BUSCA RAPIDA',):
 		st.sidebar.info('Executando Chrome')
-		st.write(ui_ultima_conversa(st.session_state.contatos_salvos))
+
+		st.session_state["ultima_conversa"] = ui_ultima_conversa_chat(st.session_state.contatos_salvos)
+
+	if st.sidebar.button('ULTIMA CONVERSA BUSCA',):
+		st.sidebar.info('Executando Chrome')
+
+		st.session_state["contatos_see_info"] = ui_ultima_conversa_rapida(st.session_state.contatos_salvos)
+
+		df = pd.DataFrame(st.session_state["contatos_see_info"] , columns=['contatos', 'ultimacvs'])
+
+		st.sidebar.write(df)
+
+	if st.sidebar.button('ULTIMA CONVERSA INTEGRADO AO ENVIO DE MENSAGEM',):
+		st.sidebar.info('Executando Chrome')
+
+		st.session_state["contatos_list"], st.session_state["ultima_conversa"]= ui_ultima_conversa(st.session_state.contatos_salvos)
+		
+		dataframe = pd.DataFrame(st.session_state["contatos_salvos"])
+		dataframe['contatos'] = st.session_state["contatos_list"]
+		dataframe['ultima conversa'] = st.session_state["ultima_conversa"]
+
+		st.session_state["contatos_salvos"]= pd.DataFrame(dataframe)
+
+		st.experimental_rerun()

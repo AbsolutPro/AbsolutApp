@@ -18,8 +18,7 @@ if os.name == 'nt':
 		win32clipboard.OpenClipboard()
 		win32clipboard.EmptyClipboard()
 		win32clipboard.SetClipboardData(win32clipboard.CF_DIB, data)
-elif os.name == 'posix':
-	import subprocess
+#import subprocess
 import re
 
 
