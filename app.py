@@ -18,7 +18,7 @@ if os.name == 'nt':
 		win32clipboard.OpenClipboard()
 		win32clipboard.EmptyClipboard()
 		win32clipboard.SetClipboardData(win32clipboard.CF_DIB, data)
-#import subprocess
+
 import re
 
 
@@ -32,25 +32,26 @@ from streamlit_quill import st_quill as text_editor
 from st_aggrid import AgGrid, DataReturnMode, GridUpdateMode, GridOptionsBuilder
 
 st.set_page_config(
-	 page_title='MKT',
-	 layout='wide',
-	 initial_sidebar_state='expanded',
-	 page_icon=literais.apple_dragon_icon, #"favicon.png" #expanded / collapsed
-	 menu_items={
-		 'Get help': 'https://github.com/jvcss',
-		 'Report a bug': "https://github.com/jvcss",
-		 'About': "App para automação whatsapp"
+	page_title='Absolut',
+	layout='wide',
+	initial_sidebar_state='expanded',
+	page_icon=literais.apple_dragon_icon,
+	menu_items={
+		'Get help': 'https://github.com/jvcss',
+		'Report a bug': "https://github.com/jvcss",
+		'About': "App para automação whatsapp"
 	}
 )
 
-if "contatos_salvos" not in st.session_state: st.session_state["contatos_salvos"] = pd.DataFrame([''], columns=['contatos'])
+if "contatos_salvos" not in st.session_state: st.session_state["contatos_salvos"] = pd.DataFrame([''], columns=['contatos'])#pd.DataFrame([''], columns=['contatos'])
 
-if "beta_on" not in st.session_state: st.session_state["beta_on"] = "nada"
+if "beta_on" not in st.session_state: st.session_state["beta_on"] = ""
 
 if "black_list" not in st.session_state: st.session_state["black_list"] =  []
 
-#if st.sidebar.button('copiar'):
-#    send_to_clipboard(f'imagem-0.jpeg')
+if "contatos_list" not in st.session_state: st.session_state["contatos_list"] = []
+
+if "ultima_conversa" not in st.session_state: st.session_state["ultima_conversa"] = []
 
 #barra lateral
 #region
@@ -62,7 +63,7 @@ try:
 except Exception as e:
 	st.info('A lista Online está denificada. Recarregue a página')
 
-st.sidebar.write(f"ESTADO? {st.session_state['beta_on']}")
+st.sidebar.info(f"Versão {st.session_state['beta_on']}")
 
 st.sidebar.markdown('____')
 st.sidebar.subheader('Lista Contatos Online')
@@ -101,8 +102,6 @@ def grade():
 
 	grid_response = AgGrid(pd.read_csv('contatos.csv'), gridOptions=gridOptions, reload_data=False, theme=selected_theme, height=400,fit_columns_on_grid_load=True,allow_unsafe_jscode=True,update_mode=update_mode[6], data_return_mode = return_mode[1], enable_enterprise_modules=False,)
 
-	#contatos_permitidos = set(list(grid_response['data']['contatos'])) -  set (list(st.session_state.black_list))
-	#print(f'PERMITIDO {contatos_permitidos}')
 	#endregion
 	st.markdown(literais.css_code_tres_botoes_lado_a_lado, unsafe_allow_html=True)
 	with st.container():
