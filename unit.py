@@ -99,9 +99,11 @@ def desistir_localizado(contato, texto):
 	ctt = contato.replace('+', '\+')
 	frases = re.findall(fr'{ctt}: "><div class="_1Gy50"><span dir="ltr" class="i0jNr selectable-text copyable-text"><span>(.*?)<', texto)
 	#
-	str_match = [s for s in frases if "sair".upper() in s]
-	print(f'PESSOA {contato} ENCONTRADO--> {str_match}\n\n')
-	print(f'FRASES VISTA--> {frases}\n\n')
+	for cada in frases:
+		print(f'CADA UNIDADE {cada}')
+	str_match = [s for s in frases if 'Desistir' in s]
+	#print(f'PESSOA {contato} ENCONTRADO--> {str_match}\n\n')
+	#print(f'FRASES VISTA--> {frases}\n\n')
 	if str_match != []:
 	#	print(f'AQUI--> {frases}')
 		return contato
