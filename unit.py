@@ -90,9 +90,16 @@ def nome_localizado(texto):
 		return re.search(r'<span dir="auto" title="(.*?)" class="gg', texto)
 
 def extrair_info_ultima_conversa(texto):
-	info_last_talk = re.search(r'<div class="_1i_wG">(.*?)</div>',texto)
-
-	return info_last_talk
+	try:
+		info_last_talk = re.search(r'<div class="_1i_wG">(.*?)</div>',texto)
+	except Exception as e:
+		print(f'Não achou nenhuma ultima conversa: {e}')
+		return ""
+	finally:
+		if info_last_talk:
+			return info_last_talk
+		else: return ""
+	
 
 def desistir_localizado(contato, texto):
 	#fr'{contato}: "><div class="_1Gy50"><span dir="ltr" class="i0jNr selectable-text copyable-text"><span>(.*?)<'
@@ -458,32 +465,43 @@ def ui_ultima_conversa_rapida( contatos_):#dataframe
 	lista_contatos_info = []
 
 	while ate_o_fim:
-		if contagem >= len(contatos_['contatos']) - 1: ate_o_fim = False
+		try:
+			if contagem >= len(contatos_['contatos']) - 1: ate_o_fim = False
 
-		btn_search = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="side"]/div[1]/div/label/div/div[2]')))
-		btn_search.click()
-		btn_search.send_keys(contatos_['contatos'][contagem])
-		time.sleep(1)
-		btn_search.send_keys(Keys.ARROW_DOWN)
-		ctt_selected = wait.until(EC.presence_of_element_located((By.CLASS_NAME, '_2_TVt')))
-		time.sleep(.81)
-		ctt_selected.click()
-		info_ultimo_contato = extrair_info_ultima_conversa(str(ctt_selected.get_attribute('innerHTML')))
+			btn_search = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="side"]/div[1]/div/label/div/div[2]')))
+			btn_search.click()
+			btn_search.send_keys(contatos_['contatos'][contagem])
+			time.sleep(1)
+			btn_search.send_keys(Keys.ARROW_DOWN)
+			ctt_selected = wait.until(EC.presence_of_element_located((By.CLASS_NAME, '_2_TVt')))
+			time.sleep(.81)
+			ctt_selected.click()
+			try:
+				info_ultimo_contato = extrair_info_ultima_conversa(str(ctt_selected.get_attribute('innerHTML')))
+			except:
+				print('Falha Na Ultima Conversa {e}')
 
-		#print(f'\n\n\n{contatos_["contatos"][contagem]} - {info_ultimo_contato.group(1)}\n\n')
+			#print(f'\n\n\n{contatos_["contatos"][contagem]} - {info_ultimo_contato.group(1)}\n\n')
+			if type(info_ultimo_contato)!=str:
+				lista_contatos_info.append(info_ultimo_contato.group(1))
+			else:
+				lista_contatos_info.append(info_ultimo_contato)
+			
+			tela_atual = wait.until(EC.presence_of_element_located((By.XPATH,'//*[@id="main"]/div[3]/div/div[2]/div[3]')))
+			se_desistente_ = desistir_localizado(contatos_['contatos'][contagem],tela_atual.get_attribute('innerHTML'))
 
-		lista_contatos_info.append(info_ultimo_contato.group(1))
-		
-		tela_atual = wait.until(EC.presence_of_element_located((By.XPATH,'//*[@id="main"]/div[3]/div/div[2]/div[3]')))
-		se_desistente_ = desistir_localizado(contatos_['contatos'][contagem],tela_atual.get_attribute('innerHTML'))
-
-		print(f'DESISTENTE {se_desistente_}\n\n')
-		
-		btn_clear = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="side"]/div[1]/div/button')))
-		time.sleep(5)
-		btn_clear.click()
-		contagem +=1
-		
+			print(f'DESISTENTE {se_desistente_}\n\n')
+			
+			btn_clear = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="side"]/div[1]/div/button')))
+			time.sleep(2)
+			btn_clear.click()
+			contagem +=1
+		except Exception as e:
+			print('Falha Na Ultima Conversa {e}')
+			btn_clear = wait.until(EC.presence_of_element_located((By.XPATH, '//*[@id="side"]/div[1]/div/button')))
+			btn_clear.click()
+		finally:
+			print('................')
 	#st.session_state["contatos_salvos"]['ultima conversa'] = lista_contatos_info
 	driver.quit()
 	return lista_contatos_info
@@ -570,4 +588,5 @@ with st.container():
 		st.sidebar.info('Executando Chrome')
 
 		st.session_state["contatos_salvos"]['ultima conversa'] = ui_ultima_conversa_rapida(st.session_state.contatos_salvos)
+		st.experimental_rerun()
 
