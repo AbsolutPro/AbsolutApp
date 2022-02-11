@@ -9,11 +9,10 @@ if os.name == 'nt':
 	import psutil
 
 	def send_to_clipboard(img_path):
-		image = Image.open(img_path)#path
+		image = Image.open(img_path)
 		output = BytesIO()
 		image.convert("RGB").save(output, "BMP")
 		data = output.getvalue()[14:]
-		#print(data)
 		output.close()
 		win32clipboard.OpenClipboard()
 		win32clipboard.EmptyClipboard()
@@ -79,6 +78,13 @@ use_checkbox = st.sidebar.checkbox("Marcador de Linha")
 editavel = st.sidebar.radio("Modo Edição", [True, False], help='Para habilitar duplo click na linha e alterar o conteúdo')
 available_themes = ["streamlit", "light", "dark", "blue", "fresh", "material"]
 selected_theme = st.sidebar.selectbox("Tema", available_themes)
+if st.sidebar.button('Apagar Arquivos'):
+	try:
+		os.remove("contatos.csv")
+		os.remove("contatos_e_status.csv")
+		st.info('Contatos Apagados')
+	except:
+		st.info('não há mais arquivos para deletar')
 
 
 #endregion
@@ -178,7 +184,7 @@ if abrir or st.session_state.beta_on == 'BETA':
 	opts.add_experimental_option("detach", True)
 	#opts.add_argument("--headless")
 	try:
-		if st.session_state.beta_on == 'BETA':#depois do primeiro acesso abre aqui
+		if st.session_state.beta_on == 'BETA':
 			col1, col2 = st.columns(2)
 			with col1:
 				caixa = st.container()
@@ -190,25 +196,32 @@ if abrir or st.session_state.beta_on == 'BETA':
 						html=caixa.checkbox("Entregar como HTML", True),
 						readonly=caixa.checkbox("Apenas leitura", False),
 						key="quill",)
-					#st.markdown(literais.css_remove_unused_itens, unsafe_allow_html=True)
+
 					if os.name == 'nt':
 						listar_imgs = re.findall( r'src="data:image/(.*?);base64,(.*?)"', fr'{content}')
 					enviar =  st.button('Enviar')
-					#pos_ = 0
-					#for _ in listar_imgs:
-						#nome_img = str(f"imagem-{pos_}.{listar_imgs[pos_][0]}")
-						#print(nome_img)
-						#pos_ += 1
+
 					if enviar:
-						motorista = webdriver.Chrome(options=opts)#options=opts ---headless
+						motorista = webdriver.Chrome(options=opts)
 						cliente = Cliente(motorista)
-						cliente.envia_msg(st.session_state.contatos_salvos,content)
-						st.subheader("Resultado")
-						
+						st.session_state["ultima_conversa"],st.session_state["contatos_list"],st.session_state["black_list"]=cliente.envia_msg_fake(st.session_state.contatos_salvos,content)
+						dataframe = pd.DataFrame(st.session_state['contatos_salvos'], index=None)
+						dataframe['contatos'] = st.session_state["contatos_list"]
+						dataframe['ultima conversa'] = st.session_state["ultima_conversa"]
+						st.session_state.contatos_salvos = dataframe
+						dataframe.to_csv('contatos_e_status.csv', index = False)
+						with open('contatos.csv', "w", encoding="utf-8") as f1:
+							for ctt in ['contatos']:
+								f1.write(ctt + '\n')
+						with open('contatos.csv', "a", encoding="utf-8") as f2:
+							contatos_permitidos = set(list(st.session_state.contatos_salvos['contatos'])) -  set (list(st.session_state.black_list))
+							for ctt in contatos_permitidos:
+								f2.write(ctt + '\n')
+
+						st.experimental_rerun()
 					if content:
 						if os.name == 'nt':
-							#se primeira image existir não entrar novamente para salvar o print
-							#and not os.path.isfile(f'image-0.{listar_imgs[0][0]}')
+
 							if len(listar_imgs) > 0 and not enviar:
 								
 								po_si = 0
@@ -217,20 +230,16 @@ if abrir or st.session_state.beta_on == 'BETA':
 										os.remove(os.path.abspath(f"imagem-{0}.{listar_imgs[po_si][0]}"))
 										po_si += 1
 										print('removi as IMAGENS anteriores primeiro')
-								
-								#print(f'ok.. {os.path.abspath(f"imagem-{0}.{listar_imgs[0][0]}")}')
+
 								pos = 0
-								for _ in listar_imgs:	#cria as imagens localmente
+								for _ in listar_imgs:
 									with open(f"imagem-{pos}.{listar_imgs[pos][0]}", 'wb') as wrb:
 										wrb.write(b64decode(listar_imgs[pos][1]))
 									send_to_clipboard(f"imagem-0.{listar_imgs[pos][0]}")
-									#print(f'anexei UMA IMAGEM instantaneamente.  {listar_imgs[pos][0]}')
 									pos += 1
 							else:
 								pass
-								#st.markdown('____')
-								#st.markdown(content, unsafe_allow_html=True)
-								#st.markdown('____')
+
 						elif os.name == 'posix':
 								st.markdown('____')
 								st.markdown(content, unsafe_allow_html=True)
@@ -245,24 +254,23 @@ if abrir or st.session_state.beta_on == 'BETA':
 					with st.form('exibir_arquivo'):
 						st.subheader('Arquivo Contatos')
 						if st.form_submit_button('⇩', help='Mostrar arquivo'):
-							st.write(pd.read_csv('contatos.csv'))
+							st.write(pd.read_csv('contatos_e_status.csv'))
 				except Exception as e:
 					st.info('contatos_salvos ausente')
 					print(f'FALHA AO EXIBIR ARQUIVO {e}')
 				finally:
 					st.download_button('contatos.csv', st.session_state.contatos_salvos.to_csv().encode('utf-8'),'contatos.csv', help='faça o download dos seus contatos do whatsapp')
+					st.download_button('contatos_e_status.csv', st.session_state.contatos_salvos.to_csv().encode('utf-8'),'contatos_e_status.csv', help='faça o download dos seus contatos com status do whatsapp',key='err',)
 		else:
-			if abrir: #PRIMEIRO ACESSO: listar contatos e salvar arquivo
+			if abrir:
 				motorista = webdriver.Chrome(options=opts)
 				se_navegador_aberto = psutil.Process(motorista.service.process.pid).is_running()
 				cliente = Cliente(motorista)
 				st.session_state.beta_on = cliente.login()
 				try:
 					st.session_state.contatos_salvos = pd.read_csv("contatos.csv")
-					if st.session_state.contatos_salvos.empty():
-						raise Exception("FALHA CRIADA NO APLICATIVO")
-					#print('falhando aqui?')
 				except Exception as e:
+					print(f'falhando aqui? {e}')
 					temp_chat_list = cliente.chats_ctt()
 					temp_chat_list += cliente.contatos()
 					temp_chat_list = list(dict.fromkeys(temp_chat_list))

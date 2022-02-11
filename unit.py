@@ -99,7 +99,7 @@ def extrair_info_ultima_conversa(texto):
 		if info_last_talk:
 			return info_last_talk
 		else: return ""
-	
+
 
 def desistir_localizado(contato, texto):
 	#fr'{contato}: "><div class="_1Gy50"><span dir="ltr" class="i0jNr selectable-text copyable-text"><span>(.*?)<'
@@ -168,8 +168,8 @@ def ui_lista_chat():
 
 		chat_ctts.append(selected_name.group(1))
 
-		if selected_name[0] != ctt_anterior:
-			ctt_anterior = selected_name[0]
+		if selected_name.group(1) != ctt_anterior:
+			ctt_anterior = selected_name.group(1)
 		else:
 			is_chat_not_end = False
 		print(f'\n\n\n\nNOME: {selected_name.group(1)}\n\n\n')
@@ -213,13 +213,13 @@ def ui_lista_contatos():
 		#lista_inter += nome_selecionado
 
 		if descricao_nome_selecionado:
-			print(f'\n\n tem descrição>  {descricao_nome_selecionado[0]}')
+			print(f'\n\n >{nome_selecionado[0]} tem descrição>  {descricao_nome_selecionado[0]}')
 		else:
 			descricao_nome_selecionado.append(str(f'descrição ausente-{str(nome_selecionado.group(1))[:2]}'))
-			print(f"\n\n SEM descricao> {str(f'descrição ausente-{str(nome_selecionado.group(1))}')}")
+			print(f"\n\n >{nome_selecionado[0]} SEM descricao> {str(f'descrição ausente-{str(nome_selecionado.group(1))}')}")
 		
-		if nome_selecionado[0] != contato_anterior or descricao_nome_selecionado[0] != descricao_anterior:
-			contato_anterior = nome_selecionado[0]
+		if nome_selecionado.group(1) != contato_anterior or descricao_nome_selecionado[0] != descricao_anterior:
+			contato_anterior = nome_selecionado.group(1)
 			descricao_anterior = descricao_nome_selecionado[0]
 		else:
 			fim_da_lista_contatos = False
