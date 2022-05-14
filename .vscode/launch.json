@@ -1,0 +1,19 @@
+{
+	// Use o IntelliSense para saber mais sobre os atributos possíveis.
+	// Focalizar para exibir as descrições dos atributos existentes.
+	// Para obter mais informações, acesse: https://go.microsoft.com/fwlink/?linkid=830387
+	"version": "0.2.0",
+	"configurations": [
+
+		{
+			"name": "Streamlit Run app.py",
+			"type": "python",
+			"request": "launch",
+			
+			"program": "C:\\Users\\Victor\\AppData\\Local\\Packages\\PythonSoftwareFoundation.Python.3.9_qbz5n2kfra8p0\\LocalCache\\local-packages\\Python39\\Scripts\\streamlit.exe",
+			"console": "integratedTerminal",
+			"justMyCode": true,
+			"args": ["run", "app.py"]
+		}
+	]
+}

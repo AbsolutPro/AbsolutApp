@@ -1,4 +1,3 @@
-
 import streamlit as st
 import os
 if os.name == 'nt':
@@ -19,13 +18,12 @@ if os.name == 'nt':
 		win32clipboard.SetClipboardData(win32clipboard.CF_DIB, data)
 
 import re
-
-
 import pandas as pd
 import strings as literais
 from whats import Cliente
 from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
+#from selenium.webdriver.chrome.options import Options as opts_google
+#from selenium.webdriver.firefox.options import Options
 
 from streamlit_quill import st_quill as text_editor
 from st_aggrid import AgGrid, DataReturnMode, GridUpdateMode, GridOptionsBuilder
@@ -44,7 +42,7 @@ st.set_page_config(
 
 if "contatos_salvos" not in st.session_state: st.session_state["contatos_salvos"] = pd.DataFrame([''], columns=['contatos'])#pd.DataFrame([''], columns=['contatos'])
 
-if "beta_on" not in st.session_state: st.session_state["beta_on"] = ""
+if "beta_on" not in st.session_state: st.session_state["beta_on"] = "."
 
 if "black_list" not in st.session_state: st.session_state["black_list"] =  []
 
@@ -52,18 +50,78 @@ if "contatos_list" not in st.session_state: st.session_state["contatos_list"] = 
 
 if "ultima_conversa" not in st.session_state: st.session_state["ultima_conversa"] = []
 
+if "escolhe_browser" not in st.session_state: st.session_state["swtich_browser"] = ""
+
+if "browser_path" not in st.session_state: st.session_state["browser_path"] = r"C:\Users\Victor\AppData\Roaming\Mozilla\Firefox\Profiles\027qdkr7.default-release"
+
+if "pc_user" not in st.session_state: st.session_state["pc_user"] = "Victor"
+
+if "chrome_user_name_path" not in st.session_state: st.session_state["chrome_user_name_path"] = 'Profile 4'
 #barra lateral
 #region
-abrir = st.sidebar.button('🎈 Whatsapp')
+escolha_de_navegador = st.sidebar.radio('', ['Gecko', 'Chromium'], 0)
+
+st.session_state["swtich_browser"] = st.sidebar.button("Login")#True#
+
+
+
+if escolha_de_navegador == 'Gecko':
+	from selenium.webdriver.firefox.options import Options
+	from selenium.webdriver.firefox.service import Service
+	opts = Options()
+	opts.add_argument('-profile')
+	opts.set_preference("dom.webnotifications.enabled", False);
+	opts.add_argument(f'{st.session_state["browser_path"]}')
+	srvc = Service(r'geckodriver.exe')
+	#motorista = webdriver.Firefox(service=srvc, options=opts)
+	#cliente = Cliente(motorista)
+
+elif escolha_de_navegador == 'Chromium':
+	from selenium.webdriver.chrome.options import Options
+	opts = Options()
+	opts.add_argument('Log-Level=3')
+	opts.add_experimental_option('excludeSwitches', ['enable-logging'])
+	opts.add_argument(fr'--user-data-dir=C:\Users\{st.session_state["pc_user"]}\AppData\Local\Google\Chrome\User Data\{st.session_state["chrome_user_name_path"]}')
+	#opts.add_argument('--headless')
+	#motorista = webdriver.Chrome(options=opts)
+	#cliente = Cliente(motorista)
 
 try:
 	if st.session_state.contatos_salvos.empty:
 		st.sidebar.info('Você não sincronizou a lista Online')
 except Exception as e:
 	st.info('A lista Online está denificada. Recarregue a página')
+	st.sidebar.info(f"Versão {st.session_state['beta_on']}")
 
-st.sidebar.info(f"Versão {st.session_state['beta_on']}")
+#st.sidebar.markdown('____')
 
+if st.sidebar.button('Open'):
+	
+	#profile_path = 
+	#opts = Options()
+	#opts.add_argument("-profile")
+	#opts.add_argument('log-level=3')
+	#opts.set_preference("dom.webnotifications.enabled", False);
+	#opts.add_argument("dom.webnotifications.enabled", False);
+	#opts.add_argument(r"C:\Users\Victor\AppData\Roaming\Mozilla\Firefox\Profiles\027qdkr7.default-release")
+	
+	#srvc = Service(r'C:\Users\Victor\Notebook\AbsolutApp\geckodriver.exe')
+	if escolha_de_navegador == 'Gecko':
+		motorista = webdriver.Firefox(service=srvc,options=opts)
+		cliente = Cliente(motorista)
+		cliente.consultar()
+	else:
+		motorista = webdriver.Chrome(options=opts)
+		cliente = Cliente(motorista)
+		cliente.consultar()
+	
+
+	#moss_do_ceu = f'--user-data-dir=C:\\Users\\Victor\\AppData\\Roaming\\Mozilla\\Firefox\\Profiles\\s2wipvcb.Absolut'
+	#opts.add_experimental_option('excludeSwitches', ['enable-logging'])
+	#opts.add_argument('log-level=3')
+	#opts.add_argument(moss_do_ceu)#(fr"--user-data-dir=C:\\Users\\{st.session_state.pc_user}\\AppData\\Local\\Google\\Chrome\\User Data\\Profile 4")
+	#opts.add_experimental_option("detach", True)
+	#profile  = webdriver.Chrome(options=opts) 
 st.sidebar.markdown('____')
 st.sidebar.subheader('Lista Contatos Online')
 st.sidebar.write(st.session_state.contatos_salvos)
@@ -85,8 +143,6 @@ if st.sidebar.button('Apagar Arquivos'):
 		st.info('Contatos Apagados')
 	except:
 		st.info('não há mais arquivos para deletar')
-
-
 #endregion
 
 def grade():
@@ -175,136 +231,163 @@ def grade():
 
 
 #region MENU
-if abrir or st.session_state.beta_on == 'BETA':
-	
-	opts = Options()
-	
-	moss_do_ceu = f'--user-data-dir=C:\\Users\\Victor\\AppData\\Local\\Google\\Chrome\\User Data\\Profile 4'
-	opts.add_argument(moss_do_ceu)#(fr"--user-data-dir=C:\\Users\\{st.session_state.pc_user}\\AppData\\Local\\Google\\Chrome\\User Data\\Profile 4")
-	opts.add_experimental_option("detach", True)
-	#opts.add_argument("--headless")
-	try:
-		if st.session_state.beta_on == 'BETA':
-			col1, col2 = st.columns(2)
-			with col1:
-				caixa = st.container()
-				caixa.subheader("Mensagem")
-				with caixa:
-					
-					content = text_editor(
-						placeholder="Escreva seu Newsletter Personalizado",
-						html=caixa.checkbox("Entregar como HTML", True),
-						readonly=caixa.checkbox("Apenas leitura", False),
-						key="quill",)
+def main_call():
+	if st.session_state["swtich_browser"] or st.session_state.beta_on == '':#'BETA':
+		try:
+			if st.session_state.beta_on == '':#'BETA':
+				col1, col2 = st.columns(2)
+				with col1:
+					caixa = st.container()
+					caixa.subheader("Mensagem")
+					with caixa:
+						
+						content = text_editor(
+							placeholder="Escreva seu Newsletter Personalizado",
+							html=caixa.checkbox("Entregar como HTML", True),
+							readonly=caixa.checkbox("Apenas leitura", False),
+							key="quill",)
 
-					if os.name == 'nt':
-						listar_imgs = re.findall( r'src="data:image/(.*?);base64,(.*?)"', fr'{content}')
-					enviar =  st.button('Enviar')
+						if os.name == 'nt':
+							listar_imgs = re.findall( r'src="data:image/(.*?);base64,(.*?)"', fr'{content}')
+						enviar =  st.button('Enviar')
 
-					if enviar:
+						if enviar:
+							
+							#opts = Options()
+							#opts.add_argument("-profile")
+							#opts.add_argument('log-level=3')
+							#opts.set_preference("dom.webnotifications.enabled", False);
+							#opts.add_argument(r"C:\Users\Victor\AppData\Roaming\Mozilla\Firefox\Profiles\027qdkr7.default-release")
+							#srvc = Service(r'C:\Users\Victor\Notebook\AbsolutApp\geckodriver.exe')
+							if escolha_de_navegador == 'Gecko':
+								motorista = webdriver.Firefox(service=srvc,options=opts)
+							#motorista = webdriver.Chrome(options=opts)
+								cliente = Cliente(motorista)
+							else:
+								motorista = webdriver.Chrome(options=opts)
+								cliente = Cliente(motorista)
+
+							st.session_state["ultima_conversa"], 
+							st.session_state["contatos_list"], 
+							st.session_state["black_list"] = cliente.envia_msg_fake(st.session_state.contatos_salvos,content)
+
+							dataframe = pd.DataFrame(st.session_state['contatos_salvos'], index=None)
+							dataframe['contatos'] = st.session_state["contatos_list"]
+							dataframe['ultima conversa'] = st.session_state["ultima_conversa"]
+							st.session_state.contatos_salvos = dataframe
+							dataframe.to_csv('contatos_e_status.csv', index = False)
+							with open('contatos.csv', "w", encoding="utf-8") as f1:
+								for ctt in ['contatos']:
+									f1.write(ctt + '\n')
+							with open('contatos.csv', "a", encoding="utf-8") as f2:
+								contatos_permitidos = set(list(st.session_state.contatos_salvos['contatos'])) -  set (list(st.session_state.black_list))
+								for ctt in contatos_permitidos:
+									f2.write(ctt + '\n')
+
+							st.experimental_rerun()
+						
+						if content:
+							if os.name == 'nt':
+
+								if len(listar_imgs) > 0 and not enviar:
+									
+									po_si = 0
+									for _ in listar_imgs:# os.listdir(os.getcwd()):
+										if os.path.exists(os.path.abspath(f"imagem-{0}.{listar_imgs[po_si][0]}")) is True:
+											os.remove(os.path.abspath(f"imagem-{0}.{listar_imgs[po_si][0]}"))
+											po_si += 1
+											print('removi as IMAGENS anteriores primeiro')
+
+									pos = 0
+									for _ in listar_imgs:
+										with open(f"imagem-{pos}.{listar_imgs[pos][0]}", 'wb') as wrb:
+											wrb.write(b64decode(listar_imgs[pos][1]))
+										send_to_clipboard(f"imagem-0.{listar_imgs[pos][0]}")
+										pos += 1
+								else:
+									pass
+
+							elif os.name == 'posix':
+									st.markdown('____')
+									st.markdown(content, unsafe_allow_html=True)
+									st.markdown('____')
+				with col2:
+					try:
+						grade()
+					except Exception as falha_grade:
+						print(f'grade retornando erro {falha_grade}')
+					try:
+						with st.form('exibir_arquivo'):
+							st.subheader('Arquivo Contatos')
+							if st.form_submit_button('⇩', help='Mostrar arquivo'):
+								st.write(pd.read_csv('contatos_e_status.csv'))
+					except Exception as e:
+						st.info('contatos_salvos ausente')
+						print(f'FALHA AO EXIBIR ARQUIVO {e}')
+					finally:
+						st.download_button('contatos.csv', st.session_state.contatos_salvos.to_csv().encode('utf-8'),'contatos.csv', help='faça o download dos seus contatos do whatsapp')
+						st.download_button('contatos_e_status.csv', st.session_state.contatos_salvos.to_csv().encode('utf-8'),'contatos_e_status.csv', help='faça o download dos seus contatos com status do whatsapp',key='err',)
+			else:
+				if st.session_state["swtich_browser"]:
+					#opts = Options()
+					#opts.add_argument("-profile")
+					#opts.add_argument('log-level=3')
+					#opts.set_preference("dom.webnotifications.enabled", False);
+					#opts.add_argument(r"C:\Users\Victor\AppData\Roaming\Mozilla\Firefox\Profiles\027qdkr7.default-release")
+					#srvc = Service(r'C:\Users\Victor\Notebook\AbsolutApp\geckodriver.exe')
+					if escolha_de_navegador == 'Gecko':
+						motorista = webdriver.Firefox(service=srvc,options=opts)
+						cliente = Cliente(motorista)
+					else:
 						motorista = webdriver.Chrome(options=opts)
 						cliente = Cliente(motorista)
-						st.session_state["ultima_conversa"],st.session_state["contatos_list"],st.session_state["black_list"]=cliente.envia_msg_fake(st.session_state.contatos_salvos,content)
-						dataframe = pd.DataFrame(st.session_state['contatos_salvos'], index=None)
-						dataframe['contatos'] = st.session_state["contatos_list"]
-						dataframe['ultima conversa'] = st.session_state["ultima_conversa"]
-						st.session_state.contatos_salvos = dataframe
-						dataframe.to_csv('contatos_e_status.csv', index = False)
-						with open('contatos.csv', "w", encoding="utf-8") as f1:
-							for ctt in ['contatos']:
-								f1.write(ctt + '\n')
-						with open('contatos.csv', "a", encoding="utf-8") as f2:
+					#se_navegador_aberto = psutil.Process(motorista.service.process.pid).is_running()
+					
+					st.session_state.beta_on = cliente.login()
+					try:
+						st.session_state.contatos_salvos = pd.read_csv("contatos.csv")
+					except Exception as e:
+						print(f'falhando aqui? {e}')
+						temp_chat_list = cliente.chats_ctt()
+						#temp_chat_list = cliente.contatos()
+						temp_chat_list += cliente.contatos()
+						temp_chat_list = list(dict.fromkeys(temp_chat_list))
+						st.session_state.contatos_salvos = pd.DataFrame(temp_chat_list, columns=['contatos'], index=None)
+						with open('contatos.csv', "w", encoding="utf-8") as fileDriver:
+							for each in st.session_state.contatos_salvos:
+								fileDriver.write(f'{each}\n')
+						
+						with open('contatos.csv', "a", encoding="utf-8") as fileDriver_:
 							contatos_permitidos = set(list(st.session_state.contatos_salvos['contatos'])) -  set (list(st.session_state.black_list))
-							for ctt in contatos_permitidos:
-								f2.write(ctt + '\n')
+						
+							for e_ach in contatos_permitidos:#st.session_state.contatos_salvos['contatos']:
+								fileDriver_.write(f'{e_ach}\n')
+					motorista.quit()
+					st.experimental_rerun()
 
-						st.experimental_rerun()
-					if content:
-						if os.name == 'nt':
+		except Exception as e:
+			if "user data directory is already in use" in str(e):
+				st.error("feche a janela do whats aberta anteriormente. Recarregue a página e tente novamente.")
+			elif "Ordinal0" in str(e):
+				st.info(e)
+				st.info(f'você pode refazer a operação excluindo o contatos virtuais já vistos')
+			else:
+				st.info(f'Já definimos o cliente e os contatos. Erro: {e}')
 
-							if len(listar_imgs) > 0 and not enviar:
-								
-								po_si = 0
-								for _ in listar_imgs:# os.listdir(os.getcwd()):
-									if os.path.exists(os.path.abspath(f"imagem-{0}.{listar_imgs[po_si][0]}")) is True:
-										os.remove(os.path.abspath(f"imagem-{0}.{listar_imgs[po_si][0]}"))
-										po_si += 1
-										print('removi as IMAGENS anteriores primeiro')
-
-								pos = 0
-								for _ in listar_imgs:
-									with open(f"imagem-{pos}.{listar_imgs[pos][0]}", 'wb') as wrb:
-										wrb.write(b64decode(listar_imgs[pos][1]))
-									send_to_clipboard(f"imagem-0.{listar_imgs[pos][0]}")
-									pos += 1
-							else:
-								pass
-
-						elif os.name == 'posix':
-								st.markdown('____')
-								st.markdown(content, unsafe_allow_html=True)
-								st.markdown('____')
-							
-			with col2:
-				try:
-					grade()
-				except Exception as falha_grade:
-					print(f'grade retornando erro {falha_grade}')
-				try:
-					with st.form('exibir_arquivo'):
-						st.subheader('Arquivo Contatos')
-						if st.form_submit_button('⇩', help='Mostrar arquivo'):
-							st.write(pd.read_csv('contatos_e_status.csv'))
-				except Exception as e:
-					st.info('contatos_salvos ausente')
-					print(f'FALHA AO EXIBIR ARQUIVO {e}')
-				finally:
-					st.download_button('contatos.csv', st.session_state.contatos_salvos.to_csv().encode('utf-8'),'contatos.csv', help='faça o download dos seus contatos do whatsapp')
-					st.download_button('contatos_e_status.csv', st.session_state.contatos_salvos.to_csv().encode('utf-8'),'contatos_e_status.csv', help='faça o download dos seus contatos com status do whatsapp',key='err',)
-		else:
-			if abrir:
-				motorista = webdriver.Chrome(options=opts)
-				se_navegador_aberto = psutil.Process(motorista.service.process.pid).is_running()
-				cliente = Cliente(motorista)
-				st.session_state.beta_on = cliente.login()
-				try:
-					st.session_state.contatos_salvos = pd.read_csv("contatos.csv")
-				except Exception as e:
-					print(f'falhando aqui? {e}')
-					temp_chat_list = cliente.chats_ctt()
-					temp_chat_list += cliente.contatos()
-					temp_chat_list = list(dict.fromkeys(temp_chat_list))
-					st.session_state.contatos_salvos = pd.DataFrame(temp_chat_list, columns=['contatos'], index=None)
-					with open('contatos.csv', "w", encoding="utf-8") as fileDriver:
-						for each in st.session_state.contatos_salvos:
-							fileDriver.write(f'{each}\n')
-					
-					with open('contatos.csv', "a", encoding="utf-8") as fileDriver_:
-						contatos_permitidos = set(list(st.session_state.contatos_salvos['contatos'])) -  set (list(st.session_state.black_list))
-					
-						for e_ach in contatos_permitidos:#st.session_state.contatos_salvos['contatos']:
-							fileDriver_.write(f'{e_ach}\n')
-				motorista.quit()
-				st.experimental_rerun()
-
-	except Exception as e:
-		if "user data directory is already in use" in str(e):
-			st.error("feche a janela do whats aberta anteriormente. Recarregue a página e tente novamente.")
-		elif "Ordinal0" in str(e):
-			st.info(e)
-			st.info(f'você pode refazer a operação excluindo o contatos virtuais já vistos')
-		else:
-			st.info(f'Já definimos o cliente e os contatos. Erro: {e}')
-
-else:
-	st.write('Você precisa se conectar ao **Whatsapp** da barra lateral')
-	st.write('')
-	st.write('')
-	st.write('Você precisa deixar o WhatsApp Beta habilitado para usar esse app')
-	st.write('')
-	st.write('')
-	st.write('Android · Abra WhatsApp > Mais opções > Dispositivos Conectados >  Multi-Dipositivos beta > Entrar no Beta.')
-	st.write('')
-	st.write('')
-	st.write('iPhone · Open Config WhatsApp > Linked Devices > Multi-Device Beta > Join Beta')
+	else:
+		st.write('Você precisa se conectar ao **Whatsapp** da barra lateral')
+		st.write('')
+		st.write('')
+		st.write('Você precisa deixar o WhatsApp Beta habilitado para usar esse app')
+		st.write('')
+		st.write('')
+		st.write('Android · Abra WhatsApp > Mais opções > Dispositivos Conectados >  Multi-Dipositivos beta > Entrar no Beta.')
+		st.write('')
+		st.write('')
+		st.write('iPhone · Open Config WhatsApp > Linked Devices > Multi-Device Beta > Join Beta')
 #endregion 
+
+
+
+if __name__ == '__main__': #
+	main_call()

@@ -590,3 +590,53 @@ with st.container():
 		st.session_state["contatos_salvos"]['ultima conversa'] = ui_ultima_conversa_rapida(st.session_state.contatos_salvos)
 		st.experimental_rerun()
 
+
+
+
+
+def remove_repeted():
+	remove_reapter = """
+						try:
+							tela_atual = wait.until(EC.presence_of_element_located((By.XPATH,'/html/body/div[1]/div/div/div[4]/div/div[3]/div/div[2]/div[3]')))
+							
+							clean_tela_atual = re.sub(CLEANR, '', tela_atual.get_attribute('innerHTML'))
+							
+							print(f'EU SEI clean_tela_atual? {clean_tela_atual}') #
+							
+							already_sending_call_back_no_texts = already_sent(clean_tela_atual, clean_mensagem)
+							time.sleep(20)
+							
+							#print(f'EU SEI Q VEM ATÉ AQUI? {already_sending_call_back_no_texts}') #
+							#time.sleep(100)
+							#already_sending_call_back_no_texts = already_sent(tela_atual, mensagem_strip)
+							
+							#mensagem_strip = mensagem_strip.replace("/n", '')
+							#print('fine, we found? '+ already_sent(clean_tela_atual, clean_mensagem))
+						except:
+							#//*[@id="main"]/div[3]/div/div[2]/div[2]/div[2]/div/div/div[1]/span/div/span
+							#print(f'fine EU SEI Q VEM ATÉ AQUI? {already_sending_call_back_no_texts}') #
+							#time.sleep(100)
+							exiting_no_content = wait_short.until(EC.presence_of_element_located((By.XPATH,'//*[@id="main"]/div[3]/div/div[2]/div[2]/div[2]/div/div/div[1]/span/div/span')))
+							#print(f"\n{exiting_no_content.get_attribute('innerHTML')}\n")
+							if strings.svg_lock == exiting_no_content.get_attribute('innerHTML'):
+								#print ("\nthey are equals, found\n")	
+								already_sending_call_back_no_texts = False#					CONVERSA LIMPA
+							else: #
+								print('erro reading lock')
+							#already_sending_call_back_no_texts = content_localizado(str(exiting_no_content.get_attribute('innerHTML')))
+							#already_sending = False
+							#mensagem_strip = mensagem
+							#mensagem_strip = mensagem_strip.replace("/n", '')
+								tela_atual = '!mensagem_strip'
+								#print ("\nnot found first as msg they are not equal found\n")
+							time.sleep(500)
+							print('EXCESSAO')
+						
+						if already_sending_call_back_no_texts:
+							#//*[@id="app"]/div/div/div[2]/div[2]/span/div/span/div/div/div[2]/div/div[1]/div[1]/div[1]
+							botao_fechar_img = wait.until(EC.presence_of_element_located(GetLocator.BOTAO_CANCELAR_IMG))
+							botao_fechar_img.click()
+							print(f"already sent to {contatos_['contatos'][contagem]}")
+							time.sleep(1)
+						else:
+							pass"""

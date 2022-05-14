@@ -1,12 +1,50 @@
-# AbsolutApp
+<h2 align="center">
+  <img src="https://img.icons8.com/clouds/2x/whatsapp.png"/>
+  <img src="https://img.icons8.com/nolan/2x/bot.png"/>
+  <br/>
+  <b>Absolut App©</b>
+  <p>Aplicativo para automatizar Whatsapp®</p>
+</h2>
 
-## Automation to whatsapp
+## O que é
 
-# read all contacts from chat and saved list
+- Aplicativo Visual para envio de menssagens automáticas no whatsapp.
 
-# send image
+## O que utiliza
 
-# send text all possible text edition
+- **Ferramentas**
+  - Python
+  - Selenium
+  - Chromedriver
+  - Streamlit
+  - Regular Expression
 
-personal 1/1/2023
-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
+## Como Executar
+
+- caso não tenha instalado as bibliotecas necessárias
+
+`pip install -r requirements.txt`
+
+```bash
+git clone https://github.com/jvcss/AbsolutApp.git
+cd whatspper
+streamlit run app.py
+```
+
+## Funcionalidades do Aplicativo
+
+- Cria **contatos.csv** automático a partir da lista de **contatos** e **conversas**
+
+- Verificação automática das palavras chave **sair** para inclusão na lista de contatos bloqueados antes de enviar a mensagem
+
+- Permite atualizar a base de contatos retirando os que foram excluídos após execução
+
+- Executável `Windows` e `Linux`
+
+- Windows permite envio de imagem e textos com edição
+
+- Linux não permite adicionar imagem na mensagem
+
+- Chrome precisa de uma versão do driver compatível com o seu navegador [Baixar](https://chromedriver.chromium.org/downloads)
+
+![Whatspper](images/plao_fundo_info_whatspper_automation.jpeg)
