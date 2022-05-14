@@ -1,0 +1,2 @@
+# AbsolutApp
+Automation for marketing
