@@ -52,11 +52,11 @@ if "ultima_conversa" not in st.session_state: st.session_state["ultima_conversa"
 
 if "escolhe_browser" not in st.session_state: st.session_state["swtich_browser"] = ""
 
-if "browser_path" not in st.session_state: st.session_state["browser_path"] = r"C:\Users\Victor\AppData\Roaming\Mozilla\Firefox\Profiles\027qdkr7.default-release"
+if "browser_path" not in st.session_state: st.session_state["browser_path"] = r"C:\Users\absol\AppData\Roaming\Mozilla\Firefox\Profiles\ap1kpuco.default-release"
 
-if "pc_user" not in st.session_state: st.session_state["pc_user"] = "Victor"
+if "pc_user" not in st.session_state: st.session_state["pc_user"] = "absol"
 
-if "chrome_user_name_path" not in st.session_state: st.session_state["chrome_user_name_path"] = 'Profile 4'
+if "chrome_user_name_path" not in st.session_state: st.session_state["chrome_user_name_path"] = 'Profile 1'
 #barra lateral
 #region
 escolha_de_navegador = st.sidebar.radio('', ['Gecko', 'Chromium'], 0)
@@ -95,7 +95,7 @@ except Exception as e:
 
 #st.sidebar.markdown('____')
 
-if st.sidebar.button('Open'):
+if st.sidebar.button('Consultar'):
 	
 	#profile_path = 
 	#opts = Options()

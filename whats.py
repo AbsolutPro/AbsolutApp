@@ -1,4 +1,4 @@
-from sympy import EX
+
 import strings
 import re
 import os
@@ -17,7 +17,7 @@ def try_catch(fail_info):
 		yield
 	except Exception as e:
 		print(f"{fail_info}")
-		with open('unique_out.txt', 'a') as uf:
+		with open('unique_out.csv', 'a') as uf:
 			uf.write(f'{fail_info}\n')
     #else:
         #print("case everthig works inside the with")
@@ -149,12 +149,20 @@ class Cliente:
 		try:
 			btn_ctt = wait.until(EC.presence_of_element_located(GetLocator.BTN_CHAT))
 			btn_ctt.click()
-			time.sleep(.51)
 			
-			#//*[@id="app"]/div[1]/div[1]/div[2]/div[1]/span/div[1]/span/div[1]/div[2]/div[2]
-			ctt_blc = wait.until(EC.presence_of_element_located(GetLocator.CTT_BLOC))#//*[@id="app"]/div[1]/div[1]/div[2]/div[1]/span/div[1]/span/div[1]/div[2]/div[2]/div/div/div[10]
-			ctt_blc.send_keys(Keys.ARROW_DOWN)
-			ctt_blc.send_keys(Keys.ARROW_UP)
+			time.sleep(.51)
+			ctt_blc1 = wait.until(EC.presence_of_element_located((By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/span/div/span/div/div[2]/div[2]')))
+			ctt_blc1.send_keys(Keys.ARROW_DOWN)
+
+			#/html/body/div[1]/div/div/div[2]/div[1]/span/div/span/div/div[2]/div[2]
+			#/html/body/div[1]/div/div/div[2]/div[1]/span/div/span/div/div[2]/div[1]
+			#/html/body/div[1]/div/div/div[2]/div[1]/span/div/span/div/div[2]/div[2]/div/div
+			#(By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/span/div/span/div/div[2]/div[2]')
+			ctt_blc = wait.until(EC.presence_of_element_located((By.XPATH, '/html/body/div[1]/div/div/div[2]/div[1]/span/div/span/div/div[2]/div[2]/div/div')))
+			#GetLocator.CTT_BLOC))#/html/body/div[1]/div/div/div[2]/div[1]/span/div/span/div/div[2]
+			#//*[@id="app"]/div[1]/div[1]/div[2]/div[1]/span/div[1]/span/div[1]/div[2]/div[2]/div/div/div[10]
+			#ctt_blc.send_keys(Keys.ARROW_DOWN)
+			#ctt_blc.send_keys(Keys.ARROW_UP)
 			
 			
 			while is_ctt_not_end:
@@ -171,24 +179,24 @@ class Cliente:
 				
 				time.sleep(.1)
 				#print(f"\n\nULTIMO COMANDO {nome_selecionado}   ??????\n\n")
-				cttss.append(str(nome_selecionado.group(1)).replace(',', ''))
+				cttss.append(str(nome_selecionado).replace(',', ''))
 				#cttss.append(str(nome_selecionado[0]).replace(',', ''))
 
 				if selec_desc_name:
-					print(f'\n\n  {nome_selecionado} :descrição: {selec_desc_name.group(1)}')
+					print(f'{nome_selecionado} :descrição: {selec_desc_name}')
 				else:
-					
 					selec_desc_name = nome_selecionado#.append(str(f'descrição ausente-{str(nome_selecionado.group(1))[:2]}'))
-					print(f'\n\n NAO TEM descrição tem conteudo {str(nome_selecionado.group(1))}')
+					print(f'NAO TEM descrição tem conteudo {str(nome_selecionado)}')
 
 
-				if nome_selecionado.group(1) != ctt_nome_anterior or selec_desc_name.group(1) != desc_nome_anterior:
-					ctt_nome_anterior = nome_selecionado.group(1)
+				if nome_selecionado != ctt_nome_anterior or selec_desc_name != desc_nome_anterior:
+					ctt_nome_anterior = nome_selecionado
 					if selec_desc_name:
-						desc_nome_anterior = selec_desc_name.group(1)
+						desc_nome_anterior = selec_desc_name
 				else:
 					is_ctt_not_end = False
-				ctt_blc.send_keys(Keys.ARROW_DOWN)
+				print('here?')
+				ctt_blc1.send_keys(Keys.ARROW_DOWN)
 
 			back_to_main = wait.until(EC.presence_of_element_located(GetLocator.BACK_BTN))
 			back_to_main.click()
@@ -211,19 +219,19 @@ class Cliente:
 			ctt_nome_anterior = ''
 			btn_search.send_keys(Keys.ARROW_DOWN)
 			try:
-				chat_bloco = fast.until(EC.presence_of_element_located((By.XPATH, '//*[@id="pane-side"]/div[1]')))#GetLocator.CHAT_BLOC))
+				chat_bloco = fast.until(EC.presence_of_element_located((By.XPATH, '//*[@id="pane-side"]')))#//*[@id="pane-side"] #(By.XPATH, '//*[@id="pane-side"]')
 			except:
-				chat_bloco = fast.until(EC.presence_of_element_located((By.XPATH, '//*[@id="pane-side"]/div[2]')))
+				chat_bloco = fast.until(EC.presence_of_element_located(GetLocator.CHAT_BLOC))#(By.XPATH, '//*[@id="pane-side"]/div[2]')))#
 			is_chat_not_end = True
 			while is_chat_not_end:
 				time.sleep(0.1)
 				chat_ctt_selected = wait.until(EC.presence_of_element_located((By.CLASS_NAME, '_2_TVt')))
 				selected_name = nome_localizado(str(chat_ctt_selected.get_attribute('innerHTML')))
 				
-				chat_ctts.append(str(selected_name.group(1)).replace(',', ''))
+				chat_ctts.append(str(selected_name).replace(',', ''))
 				
-				if selected_name.group(1) != ctt_nome_anterior:
-					ctt_nome_anterior = selected_name.group(1)
+				if selected_name != ctt_nome_anterior:
+					ctt_nome_anterior = selected_name
 				else:
 					is_chat_not_end = False
 				chat_bloco.send_keys(Keys.ARROW_DOWN)
@@ -252,7 +260,7 @@ class Cliente:
 
 			if bool(listar_imgs):
 				
-				wait = WebDriverWait(self.google, 10)
+				wait = WebDriverWait(self.google, 999)
 				contagem = 0
 
 				while ate_o_fim:
@@ -269,9 +277,7 @@ class Cliente:
 					time.sleep(.53)
 
 					btn_search.send_keys(Keys.TAB)#firefox
-					try: 
-						#SE EXISTE NA BUSCA
-						self.google.find_element_by_class_name('_2_TVt')
+					try:
 						ctt_selected = wait.until(EC.presence_of_element_located((By.CLASS_NAME, '_2_TVt')))
 						selected_name = nome_localizado(str(ctt_selected.get_attribute('innerHTML')))
 						info_ultimo_contato = extrair_info_ultima_conversa(str(ctt_selected.get_attribute('innerHTML')))
@@ -286,7 +292,7 @@ class Cliente:
 						try:
 							# the only way to check is waiting for texto box
 							
-							espaco_enviar = wait.until(EC.presence_of_element_located(GetLocator.TEXT_BOX_CHAT))
+							#espaco_enviar = wait.until(EC.presence_of_element_located(GetLocator.TEXT_BOX_CHAT))
 							#self.google.find_element_by_xpath(GetLocator.TEXT_BOX_CHAT)
 							# #wait.until(EC.presence_of_element_located(GetLocator.TEXT_BOX_CHAT))
 							espaco_enviar.click()
@@ -301,7 +307,7 @@ class Cliente:
 								actions.key_down(Keys.CONTROL).send_keys('v').key_up(Keys.CONTROL).perform()
 								time.sleep(1)
 						except Exception as e:
-							print(f'{contatos_["contatos"][contagem]}')
+							print(f' THE BOX {contatos_["contatos"][contagem]}')
 						try:
 							#INPUT TEXT => ENVIAR_MSG
 							espaco_enviar = wait.until(EC.presence_of_element_located(GetLocator.ESPACO_ENVIAR_MSG ))
@@ -309,28 +315,33 @@ class Cliente:
 							#espaco_enviar = wait.until(EC.presence_of_element_located(GetLocator.ENTRADA_ENVIAR_MSG))
 							#time.sleep(100)
 							#print(f'\n\n\n\n{texto_p_enviar}\n\n\n\n')
-							for part in texto_p_enviar.split('/n'):
-								try:
-									espaco_enviar.send_keys(part)
-								except Exception as exp:
-									#print(f"{exp}")
+							try:
+								for part in texto_p_enviar.split('/n'):
+									try:
+										espaco_enviar.send_keys(part)
+									except Exception as exp:
+										print(f"SEM ESPAÇO {exp}")
+										time.sleep(1)
+									ActionChains(self.google).key_down(Keys.SHIFT).key_down(Keys.ENTER).key_up(Keys.SHIFT).key_up(Keys.ENTER).perform()
 									time.sleep(1)
-								ActionChains(self.google).key_down(Keys.SHIFT).key_down(Keys.ENTER).key_up(Keys.SHIFT).key_up(Keys.ENTER).perform()
-								time.sleep(1)
-							#espaco_enviar.send_keys(texto_p_enviar)
+							except:
+								print(f"FALHE NO CHAIN para EXTRA ESPAÇO {exp}")
+								time.sleep(10)
+								
+								espaco_enviar.send_keys(texto_p_enviar)
 
 							botao_enviar = wait.until(EC.presence_of_element_located(GetLocator.BOTAO_ENVIAR_IMG))
 							botao_enviar.click()
 							time.sleep(1)
 
 						except Exception as e:
-							print(f"{nome_de_fato}")
+							print(f"ESPACO_ENVIAR_MSG {nome_de_fato}")
 
 						contagem += 1
 						#print(f'contagem de contatos {contagem}', end='')
 
 					except Exception as e:
-						print(f"{nome_de_fato}")
+						print(f"FALHA ANTERIOR {nome_de_fato}")
 
 
 						contagem += 1
@@ -338,11 +349,8 @@ class Cliente:
 						btn_clear = wait.until(EC.presence_of_element_located(GetLocator.CLEAR_BUTTON))
 						btn_clear.click()
 						time.sleep(2)
-					btn_clear = wait.until(EC.presence_of_element_located(GetLocator.CLEAR_BUTTON))
-					btn_clear.click()
-
-					
-
+					#btn_clear = wait.until(EC.presence_of_element_located(GetLocator.CLEAR_BUTTON))
+					#btn_clear.click()
 				self.google.quit()
 				return lista_contatos_info, lista_contatos_
 
@@ -483,7 +491,7 @@ class Cliente:
 					#print('OK ATE AQUI?')
 					time.sleep(2)
 
-					btn_search.send_keys(Keys.TAB)#firefox
+					btn_search.send_keys(Keys.ARROW_DOWN)#firefox* NEW ACCESS KEY
 					try:
 						#SE EXISTE NA BUSCA
 						time.sleep(2)
@@ -509,62 +517,60 @@ class Cliente:
 							#print(tela_atual.get_attribute('innerHTML'))
 							
 
-							CLEANR = re.compile(r'<.*?>')#\d(.*)\d\d \w\w ADD NEW LINES
-							CLEANR_rmv_src = re.compile(r's.*>')
-							CLEANR_rmv_nl_nl = re.compile(r'<.*\n.*\n.*"')
-							CLEANR_ = re.compile(r'\n.*\n')
+							CLEANR = re.compile(r'<.*?>')#STILL REMOVE MULTIPLE SPACES.
+							CLEANR_enter = re.compile(r'\n')
+							#CLEANR #after remove new lines
+							
 							#remove nested new lines from regex img
-							#CLEANR_tg_add_nl = re.compile('\d\d:\d\d')
-							CLEANR_rmv_single = re.compile('^\S+$')#remove single words in one line
-							CLEANR_all_az09 = re.compile(r'[^A-Za-z0-9 ]+')#allow char
 							
 
 							remover_alert = " mensagens são protegidas com a criptografia de ponta a ponta e ficam somente entre você e os participantes desta conversa. Nem mesmo o WhatsApp pode ler ou ouvi-las. Clique para saber mais."
-							mensagem_instance = re.sub(CLEANR, '', str(tela_atual.get_attribute('innerHTML')))
-							mensagem_instance = re.sub(CLEANR_rmv_src, '', mensagem_instance)
-							mensagem_instance = re.sub(CLEANR_rmv_nl_nl, '', mensagem_instance)
-							mensagem_instance = re.sub(CLEANR_, '', mensagem_instance)
-
-							mensagem_instance = mensagem_instance.replace('"', '')
-							mensagem_instance = mensagem_instance.replace('*', '')
-							mensagem_instance = mensagem_instance.replace('_', '')
-							mensagem_instance = mensagem_instance.replace('```', '')
-							mensagem_instance = mensagem_instance.replace(remover_alert, ' ')
-							mensagem_instance = re.sub(CLEANR_rmv_single, '', mensagem_instance)
-							#mensagem_instance = re.sub(CLEANR_all_az09, '', CLEANR_rmv_single)
-							#clean_mensagem = re.sub(CLEANR_all_az09, '', clean_mensagem)
-
-							mensagem_instance = mensagem_instance.replace(' ', '')
-							clean_mensagem = clean_mensagem.replace(' ', '')
-
-							#mensagem_instance = '\n'.join(mensagem_instance)
-							with open('regrex.html', 'w', encoding="utf-8") as f:
-								f.write(mensagem_instance)
 							
-							print(mensagem_instance)
-							print('--------------------------------------------------------')
-							print(clean_mensagem[0-6])
-							print('\n-search----------------------------------------------------')
+							
+							mensagem_instance = re.sub(CLEANR, '', str(tela_atual.get_attribute('innerHTML')))
+							mensagem_instance = re.sub(CLEANR_enter, '', mensagem_instance)
+							mensagem_instance = re.sub(CLEANR, '', mensagem_instance)
+							mensagem_instance = mensagem_instance.replace(remover_alert, ' ')
+							with open('READ_OUT.html', 'w', encoding="utf-8") as f:
+								f.write(mensagem_instance)
 
-							print(re.search(clean_mensagem, mensagem_instance))
+							clean_mensagem = clean_mensagem.replace('~', '')
+							clean_mensagem = clean_mensagem.replace('*', '')
+							clean_mensagem = clean_mensagem.replace('_', '')
+							clean_mensagem = clean_mensagem.replace('```', '')
+							
+							with open('READ_IN.html', 'w', encoding="utf-8") as f:
+								f.write(clean_mensagem)
+							#print('find.......')
+							#time.sleep(999999)
+
+							#print(re.search(clean_mensagem, mensagem_instance))
 							find_already_sent = re.search(clean_mensagem, mensagem_instance)
-							if find_already_sent is not None:
-								print('HOLY SHIT')
-								
-								time.sleep(10)
+							find__out_msg_already_sent = re.search("sair", mensagem_instance.lower())
+							if find_already_sent is not None or find__out_msg_already_sent is not None:
+								print('...dont send, clear manually')
+								#btn_clear = wait.until(EC.presence_of_element_located(GetLocator.CLEAR_BUTTON))
+								#btn_clear.click()
+								time.sleep(1)
 							else:
-								print('message not found')
-								time.sleep(10)
+								print(f'can...send to {contatos_["contatos"][contagem]}')
+								time.sleep(1)
 								#METODO CAPTURE SPACE
-								with try_catch(f'{contatos_["contatos"][contagem]}'):
+								
+								try:
 									espaco_enviar = wait.until(EC.presence_of_element_located(GetLocator.TEXT_BOX_CHAT))
-									espaco_enviar.click()
+								except:
+									print('nao pegou text box')
+								try:
+									espaco_enviar.click()#NÃO É MAIS NECESSARIO
 									time.sleep(1)
-									for _ in listar_imgs:
-										time.sleep(1)
-										actions = ActionChains(self.google)
-										actions.key_down(Keys.CONTROL).send_keys('v').key_up(Keys.CONTROL).perform()
-										time.sleep(1)
+								except:
+									print('falha local !click')
+								try:
+									actions = ActionChains(self.google)
+									actions.key_down(Keys.CONTROL).send_keys('v').key_up(Keys.CONTROL).perform()
+								except:
+									print('falha ACTION')
 								#METODO ENVIA TEXTO
 								with try_catch(f"{contatos_['contatos'][contagem]}"):
 									espaco_enviar = wait.until(EC.presence_of_element_located(GetLocator.ESPACO_ENVIAR_MSG))
@@ -577,26 +583,43 @@ class Cliente:
 									botao_enviar = wait.until(EC.presence_of_element_located(GetLocator.BOTAO_ENVIAR_IMG))
 									botao_enviar.click()
 									time.sleep(1)
+								#PASSA PRA ULTIMA POSIÇÃO o CONTATO ATUAL
+								not_use ="""with try_catch(f"{contatos_['contatos'][contagem]}"):
+									contatos_['contatos'].sort(key = contatos_['contatos'][contagem].__eq__)
+
+									with open('contatos.csv', "w", encoding="utf-8") as f1:
+										for ctt in contatos_:
+											f1.write(ctt + '\n')
+											"""
+
+
+
+
+								
 						except Exception as e:
 							print(f'is not to came here {e}')
-							with open('unique_out.txt', 'w') as f:
-								f.write(f"{contatos_['contatos'][contagem]}")
+							with open('unique_out.csv', 'a') as f:
+								f.write(f"{contatos_['contatos'][contagem]}\n")
 						
 
 						contagem += 1
 
 					except Exception as e:
 						#print(f"{contatos_['contatos'][contagem]}")
-						with open('unique_out.txt', 'a') as ef:
-							ef.write(f"{contatos_['contatos'][contagem]}")
+						with open('unique_out.csv', 'a') as ef:
+							ef.write(f"{contatos_['contatos'][contagem]}\n")
 						#PULAR ERRO. NAO ENCONTROU contato
 						contagem += 1
-						#print(f'contagem de contatos {contagem}')
+						print(f'falha geral {contagem} {e}')
 						btn_clear = wait.until(EC.presence_of_element_located(GetLocator.CLEAR_BUTTON))
 						btn_clear.click()
 						time.sleep(2)
-					btn_clear = wait.until(EC.presence_of_element_located(GetLocator.CLEAR_BUTTON))
-					btn_clear.click()
+					#whatsapp now clear automatically this field
+					try:
+						btn_clear = wait.until(EC.presence_of_element_located(GetLocator.CLEAR_BUTTON))
+						btn_clear.click()
+					except Exception as e:
+						pass
 
 				self.google.quit()
 				return lista_contatos_info, lista_contatos_
@@ -673,59 +696,76 @@ class GetLocator(object):
 	"""
 	
 	BTN_CHAT = (By.XPATH, '//*[@id="side"]/header/div[2]/div/span/div[2]/div')
+	
 	"""
 		button: DIV
 	"""
-	#tab_index_contact_key N USADO AINDA
 	CTT_LIST_BOX = (By.XPATH, '//*[@id="app"]/div[1]/div[1]/div[2]/div[1]/span/div[1]/span/div[1]/div[2]/div[2]/div/div')
-	"""
-		block: DIV
-	"""
 
+	"""
+		//*[@id="app"]/div[1]/div[1]/div[2]/div[1]/span/div[1]/span/div[1]/div[2]/div[2]
+	"""
 	CTT_BLOC = (By.XPATH , '//*[@id="app"]/div[1]/div[1]/div[2]/div[1]/span/div[1]/span/div[1]/div[2]/div[2]')
-	"""
-		block: DIV
-	"""
 
-	SEARCH_INPUT = (By.XPATH, '//*[@id="side"]/div[1]/div/label/div/div[2]')
 	"""
-		input: DIV
+		/html/body/div[1]/div/div/div[3]/div/div[1]/div/div/div[2]/div/div[2]
+		//*[@id="side"]/div[1]/div/label/div/div[2]
+	"""
+	SEARCH_INPUT = (By.XPATH, '//*[@id="side"]/div[1]/div/div/div[2]/div/div[2]')
+
+	"""
+		
 	"""
 	CHAT_BLOC = (By.XPATH, '//*[@id="pane-side"]/div[2]')
+
 	"""
-		block: DIV
+		/html/body/div[1]/div/div/div[3]/div/div[1]/div/div/button
 	"""
-	BACK_BTN = (By.XPATH, '//*[@id="app"]/div[1]/div[1]/div[2]/div[1]/span/div[1]/span/div[1]/header/div/div[1]/button')
+	BACK_BTN = (By.XPATH, '//*[@id="side"]/div[1]/div/div/button')
 	
+
 	"""
-		input: BUTTON
+		/html/body/div[1]/div/div/div[3]/div/div[1]/div/div/span/button
 	"""
-	CLEAR_BUTTON = (By.XPATH, '//*[@id="side"]/div[1]/div/button')
+	CLEAR_BUTTON = (By.XPATH, '//*[@id="side"]/div[1]/div/div/span/button')
+
+
 	"""
-		input: BUTTON
+		//*[@id="main"]/footer/div[1]/div/span[2]/div/div[2]/div[1]/div/div[2]
+	"""
+	TEXT_BOX_CHAT = (By.XPATH,'/html/body/div[1]/div/div/div[4]/div/footer/div[1]/div/span[2]/div/div[2]/div[1]/div/div[2]')
+
+
 	"""
 
-	TEXT_BOX_CHAT = (By.XPATH,'//*[@id="main"]/footer/div[1]/div/span[2]/div/div[2]/div[1]/div/div[2]')
-	
-	"""
-		block: DIV
 	"""
 	ENTRADA_ENVIAR_MSG = (By.XPATH, '/html/body/div[1]/div[1]/div[1]/div[2]/div[2]/span/div[1]/span/div[1]/div/div[2]/div/div[1]/div[3]/div/div/div[2]/div[1]/div[2]')
-	"""
-		block: DIV
-	"""
-	TEXTO_TELA_PRINCIPAL_MSG = (By.XPATH, '//*[@id="main"]/div[3]/div/div[2]/div[3]')
+
+
+
 
 	"""
-		INPUT: BUTTON
+		//*[@id="main"]/div[3]/div/div[2]/div[3]
 	"""
-	BOTAO_ENVIAR_IMG = (By.XPATH, '//*[@id="app"]/div[1]/div[1]/div[2]/div[2]/span/div[1]/span/div[1]/div/div[2]/div/div[2]/div[2]/div/div')
-	"""
-		block: DIV
-	"""
-	ESPACO_ENVIAR_MSG = (By.XPATH,'//*[@id="app"]/div[1]/div[1]/div[2]/div[2]/span/div[1]/span/div[1]/div/div[2]/div/div[1]/div[3]/div/div/div[2]/div[1]/div[2]')
+	TEXTO_TELA_PRINCIPAL_MSG = (By.XPATH, '/html/body/div[1]/div/div/div[4]/div/div[3]/div/div[2]/div[3]')
+
+
 
 	"""
-	
+		//*[@id="app"]/div[1]/div[1]/div[2]/div[2]/span/div[1]/span/div[1]/div/div[2]/div/div[2]/div[2]/div/div
 	"""
-	BOTAO_CANCELAR_IMG = (By.XPATH, '//*[@id="app"]/div/div/div[2]/div[2]/span/div/span/div/div/div[2]/div/div[1]/div[1]/div[1]')
+	BOTAO_ENVIAR_IMG = (By.XPATH, '/html/body/div[1]/div/div/div[2]/div[2]/span/div/span/div/div/div[2]/div/div[2]/div[2]/div/div')
+
+
+
+	"""
+		//*[@id="app"]/div[1]/div[1]/div[2]/div[2]/span/div[1]/span/div[1]/div/div[2]/div/div[1]/div[3]/div/div/div[2]/div[1]/div[2]
+	"""
+	ESPACO_ENVIAR_MSG = (By.XPATH,'/html/body/div[1]/div/div/div[2]/div[2]/span/div/span/div/div/div[2]/div/div[1]/div[3]/div/div/div[2]/div[1]/div[2]')
+
+
+
+	"""
+		//*[@id="app"]/div/div/div[2]/div[2]/span/div/span/div/div/div[2]/div/div[1]/div[1]/div[1]
+	"""
+	BOTAO_CANCELAR_IMG = (By.XPATH, '/html/body/div[1]/div/div/div[2]/div[2]/span/div/span/div/div/div[2]/div/div[1]/div[1]/div[1]')
