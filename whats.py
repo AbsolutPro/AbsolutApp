@@ -485,13 +485,19 @@ class Cliente:
 					btn_search.click()
 					
 					btn_search.send_keys(contatos_['contatos'][contagem])
-					btn_search.click()
+					#btn_search.click()
 					#************************************************************
 					#PAUSE INFINITO
-					#print('OK ATE AQUI?')
-					time.sleep(2)
-
-					btn_search.send_keys(Keys.ARROW_DOWN)#firefox* NEW ACCESS KEY
+					print('OK ATE AQUI')
+					try:
+						ActionChains(self.google).send_keys(Keys.TAB).perform()
+						time.sleep(2)
+						ActionChains(self.google).send_keys(Keys.TAB).perform()
+						#btn_search.send_keys(Keys.ARROW_DOWN)#firefox* NEW ACCESS KEY
+					except Exception as e:
+						print(f'falha select ITEM: {e}')
+					#
+					time.sleep(2000)
 					try:
 						#SE EXISTE NA BUSCA
 						time.sleep(2)
