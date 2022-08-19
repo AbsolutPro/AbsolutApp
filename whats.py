@@ -130,7 +130,7 @@ class Cliente:
 
 		wait = WebDriverWait(self.google, 999)
 		try:
-			wnd = wait.until(EC.visibility_of_element_located(GetLocator.O_BETA))
+			wnd = wait.until(EC.visibility_of_element_located(GetLocator.ALPHA))
 		except TimeoutException:
 			self.google.quit()
 			return "você precisa ler o QR CODE. Tente denovo"
@@ -497,7 +497,7 @@ class Cliente:
 					except Exception as e:
 						print(f'falha select ITEM: {e}')
 					#
-					time.sleep(2000)
+					#time.sleep(2000)
 					try:
 						#SE EXISTE NA BUSCA
 						time.sleep(2)
@@ -695,7 +695,7 @@ class GetLocator(object):
 	"""
 		:Getter: 'Web Element'
 	"""
-	
+	ALPHA = (By.XPATH, '/html/body/div[1]/div/div/div[3]/header/div[1]/div') #SEM BETA $ SEM NOME.
 	O_BETA = (By.XPATH, '//*[@id="side"]/header/div[1]/div')#'//*[@id="side"]/header/div[1]/div[2]/b')
 	"""
 		span: TEXT 'beta'
