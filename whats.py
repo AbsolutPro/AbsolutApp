@@ -322,7 +322,10 @@ class Cliente:
 									except Exception as exp:
 										print(f"SEM ESPAÇO {exp}")
 										time.sleep(1)
-									ActionChains(self.google).key_down(Keys.SHIFT).key_down(Keys.ENTER).key_up(Keys.SHIFT).key_up(Keys.ENTER).perform()
+									try:
+										ActionChains(self.google).key_down(Keys.SHIFT).key_down(Keys.ENTER).key_up(Keys.SHIFT).key_up(Keys.ENTER).perform()
+									except Exception as actionKeyFault:
+										print(f'ENTERS? {actionKeyFault} ')
 									time.sleep(1)
 							except:
 								print(f"FALHE NO CHAIN para EXTRA ESPAÇO {exp}")
@@ -568,27 +571,30 @@ class Cliente:
 								except:
 									print('nao pegou text box')
 								try:
-									espaco_enviar.click()#NÃO É MAIS NECESSARIO
-									time.sleep(1)
-								except:
-									print('falha local !click')
-								try:
 									actions = ActionChains(self.google)
+									#cola imagem
 									actions.key_down(Keys.CONTROL).send_keys('v').key_up(Keys.CONTROL).perform()
+
+									#METODO ENVIA TEXTO
+									with try_catch(f"METODO {contatos_['contatos'][contagem]}"):
+										espaco_enviar = wait.until(EC.presence_of_element_located(GetLocator.ESPACO_ENVIAR_MSG))
+										for part in texto_p_enviar.split('/n'):
+											#espaco_enviar.send_keys(part)
+											#ONLY SEND STRING ARRAY WITHIN OBJECT ACTION! @FIX 16/11/2022
+											actions.send_keys(part)
+											print(f'paragrafo por paragrafo {part}\n\n\n')
+											time.sleep(2)
+											actions.key_down(Keys.SHIFT).key_down(Keys.ENTER).key_up(Keys.SHIFT).key_up(Keys.ENTER).perform()
+											
+											time.sleep(20)
+											
+										botao_enviar = wait.until(EC.presence_of_element_located(GetLocator.BOTAO_ENVIAR_IMG))
+										botao_enviar.click()
+										time.sleep(1)
 								except:
 									print('falha ACTION')
-								#METODO ENVIA TEXTO
-								with try_catch(f"{contatos_['contatos'][contagem]}"):
-									espaco_enviar = wait.until(EC.presence_of_element_located(GetLocator.ESPACO_ENVIAR_MSG))
-									for part in texto_p_enviar.split('/n'):
-										with try_catch(f"{contatos_['contatos'][contagem]}"):
-											espaco_enviar.send_keys(part)
-											time.sleep(1)
-										ActionChains(self.google).key_down(Keys.SHIFT).key_down(Keys.ENTER).key_up(Keys.SHIFT).key_up(Keys.ENTER).perform()
-										time.sleep(1)
-									botao_enviar = wait.until(EC.presence_of_element_located(GetLocator.BOTAO_ENVIAR_IMG))
-									botao_enviar.click()
-									time.sleep(1)
+								
+								
 								#PASSA PRA ULTIMA POSIÇÃO o CONTATO ATUAL
 								not_use ="""with try_catch(f"{contatos_['contatos'][contagem]}"):
 									contatos_['contatos'].sort(key = contatos_['contatos'][contagem].__eq__)
@@ -765,9 +771,9 @@ class GetLocator(object):
 
 
 	"""
-		//*[@id="app"]/div[1]/div[1]/div[2]/div[2]/span/div[1]/span/div[1]/div/div[2]/div/div[1]/div[3]/div/div/div[2]/div[1]/div[2]
+		//*OLD [@id="app"]/div[1]/div[1]/div[2]/div[2]/span/div[1]/span/div[1]/div/div[2]/div/div[1]/div[3]/div/div/div[2]/div[1]/div[2]
 	"""
-	ESPACO_ENVIAR_MSG = (By.XPATH,'/html/body/div[1]/div/div/div[2]/div[2]/span/div/span/div/div/div[2]/div/div[1]/div[3]/div/div/div[2]/div[1]/div[2]')
+	ESPACO_ENVIAR_MSG = (By.XPATH,'/html/body/div[1]/div/div/div[2]/div[2]/span/div/span/div/div/div[2]/div/div[1]/div[3]/div/div/div[2]/div[1]/div[1]')
 
 
 
